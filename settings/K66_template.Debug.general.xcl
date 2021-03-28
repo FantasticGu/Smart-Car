@@ -1,0 +1,17 @@
+"D:\IAR Systems\Embedded Workbench 8.1\arm\bin\armproc.dll" 
+
+"D:\IAR Systems\Embedded Workbench 8.1\arm\bin\armjlink2.dll" 
+
+"C:\Users\16078\Desktop\Smart-Car\Debug\Exe\K66_template.out" 
+
+--plugin="D:\IAR Systems\Embedded Workbench 8.1\arm\bin\armbat.dll" 
+
+--device_macro="D:\IAR Systems\Embedded Workbench 8.1\arm\config\debugger\NXP\Kxx.dmac" 
+
+--device_macro="D:\IAR Systems\Embedded Workbench 8.1\arm\config\debugger\NXP\K6x_Trace.dmac" 
+
+--flash_loader="C:\Users\16078\Desktop\Smart-Car\Linker_Files\FlashK66Fxxx256K.board" 
+
+
+
+
