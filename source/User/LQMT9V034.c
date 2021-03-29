@@ -562,7 +562,7 @@ void SendPicture(void)
   
     uart_putchar(test_port, 0x01);
   uart_putchar(test_port, 0xFE);
-  for (int i = 0; i < IMAGEH; i++) 
+  /*for (int i = 0; i < IMAGEH; i++) 
   { 
     for (int j = 0; j < IMAGEW; j++) 
     { 
@@ -577,7 +577,7 @@ void SendPicture(void)
         uart_putchar(test_port,0x00);
       }
     } 
-  } 
+  } */
   
   int i = 0, j = 0;
 
@@ -586,7 +586,7 @@ void SendPicture(void)
   {
     for(j=0;j<IMAGEW;j++)    //输出从第0列到列，用户可以选择性的输出合适的列数
     {
-      //uart_putchar(test_port,Image_Data[i][j]);
+      uart_putchar(test_port,Image_Data[i][j]);
     }
   }
   uart_putchar (test_port, 0xFE);
@@ -617,17 +617,10 @@ void SendPicture_char(void)
 #define ECHO PTE3
 
 
-int status = 0;
-int circle = 0;
-int readyright = 0;
-int readyleft = 0;
-int intoright = 0;
-int intoleft = 0;
-int outright = 0;
-int jumppoint = 0;
+int rstatus = 0;
+int lstatus = 0;
 int havestop = 0;
 int incross = 0;
-int havecircle = 0;
 
 int Mmin(int a,int b)
 {
@@ -651,6 +644,7 @@ void imagineProcess(void)
           exti_disable(PTD15); //场中断关闭 
           
           clearDelPar();//清零处理参数
+          SendPicture();
           find_edge();//
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
@@ -661,7 +655,7 @@ void imagineProcess(void)
           }
          uart_printf(UART_0,"\n\n");*/
           ele_direction_control();      
-          //SendPicture();
+          
           
           /*for(j = 0;j<V-1;j++)
           {
@@ -764,11 +758,11 @@ void imagineProcess(void)
                   }
                   if(l>20)
                   {
-                     status = 1;
+                     rstatus = 1;
                   }
                 }            
               }
-              if(status == 1)
+              if(rstatus == 1)
               {
                 int haveRight = 0;
                 int rightVal = 0;
@@ -794,14 +788,14 @@ void imagineProcess(void)
                 rightVal = 0;
                 if(haveRight)
                 {
-                  status = 2;
+                  rstatus = 2;
                   /*setpoint1 = setpoint2 = 0;
                   delayms(1000);
                   setpoint1 = setpoint2 = 300;*/
                 }
                 
               }
-              if(status == 2)
+              if(rstatus == 2)
               {
                 int lostRight = 0;
                 int rightVal = 0;
@@ -817,19 +811,19 @@ void imagineProcess(void)
                 rightVal = 0;
                 if(lostRight)
                 {
-                  status = 3;
+                  rstatus = 3;
                 }
                 
               }
-              if(status==3)
+              if(rstatus==3)
               {
                 delayms(200);
                 PWMSetSteer(850);
-                delayms(1000);
-                status = 4;
+                delayms(800);
+                rstatus = 4;
               }
               
-              if(status==4)
+              if(rstatus==4)
               {
                 int lostLeft = 0;
                 int leftVal = 0;
@@ -848,7 +842,166 @@ void imagineProcess(void)
                   lostLeft = 0;
                   PWMSetSteer(850);
                   delayms(1000);
-                  status = 0;
+                  rstatus = 0;
+                }
+              }
+              
+              
+              
+           int lostLeft = 0;
+           int haveLeft = 0;
+           int leftVal = 0;
+            for(i = H-31;i>H-41;i--)
+            {
+              leftVal += Bline_left[i];
+            }
+            leftVal /= 10;
+            if(leftVal < 10)
+            {
+              lostLeft = 1;
+            }
+            leftVal = 0;
+            for(i = H-16;i>H-26;i--)
+            {
+             leftVal += Bline_left[i]; 
+            }
+            leftVal /= 10;
+            if(leftVal > 20)
+            {
+              haveLeft = 1;
+            }
+            leftVal = 0;
+              if(lostLeft && haveLeft)
+              {
+                lostLeft = 0;
+                haveLeft = 0;
+                int p1 = 0;
+                int p2 = 0;
+                int p3 = 0;
+                for(int j = H-11;j>H-14;j--)
+                {
+                  if (Bline_right[j]<168)
+                  {
+                     p1 = Bline_right[j];
+                     break;
+                  }
+                  
+                } 
+                for(int j = H-19;j>H-22;j--)
+                {
+                  if (Bline_right[j]<165)
+                  {
+                     p2 = Bline_right[j];
+                     break;
+                  }
+                  
+                } 
+                for(int j = H-26;j>H-30;j--)
+                {
+                  if (Bline_right[j]<160)
+                  {
+                     p3 = Bline_right[j];
+                     break;
+                  }
+                  
+                }
+                if(p1 && p2 && p3 && abs(p2-p1)<10 && abs(p3-p2)<10 && abs(p3-p1)<20)
+                {
+                  int r = 0;
+                  for(int j = H-11;j>H-41;j--)
+                  {
+                    if(Bline_right[j]<165)
+                    {
+                      r++;
+                    }
+                  }
+                  if(r>20)
+                  {
+                     lstatus = 1;
+                  }
+                }            
+              }
+              if(lstatus == 1)
+              {
+                int haveLeft = 0;
+                int leftVal = 0;
+                for(i = H-35;i>H-45;i--)
+                {
+                  leftVal += Bline_left[i];
+                }
+                leftVal /= 10;
+                if(leftVal > 30)
+                {
+                  haveLeft = 1;
+                }
+                /*rightVal = 0;
+                for(i = H-5;i>H-15;i--)
+                {
+                  rightVal += Bline_right[i];
+                }
+                rightVal /= 10;
+                if(rightVal < 180 && haveRight == 1)
+                {
+                  haveRight = 2;
+                }*/
+                leftVal = 0;
+                if(haveLeft)
+                {
+                  lstatus = 2;
+                  /*setpoint1 = setpoint2 = 0;
+                  delayms(1000);
+                  setpoint1 = setpoint2 = 300;*/
+                }
+                
+              }
+              if(lstatus == 2)
+              {
+                int lostLeft = 0;
+                int leftVal = 0;
+                for(i = H-25;i>H-35;i--)
+                {
+                  leftVal += Bline_left[i];
+                }
+                leftVal /= 10;
+                if(leftVal < 10)
+                {
+                  lostLeft = 1;
+                }
+                leftVal = 0;
+                if(lostLeft)
+                {
+                  lstatus = 3;
+                }
+                
+              }
+              if(lstatus==3)
+              {
+                delayms(200);
+                PWMSetSteer(1150);
+                delayms(600);
+                lstatus = 4;
+              }
+              
+              if(lstatus==4)
+              {
+                int lostRight = 0;
+                int rightVal = 0;
+                for(i = H-15;i>H-25;i--)
+                {
+                  rightVal += Bline_right[i];
+                }
+                rightVal /= 10;
+                if(rightVal > 180)
+                {
+                  lostRight = 1;
+                }
+                rightVal = 0;
+                if(lostRight)
+                {
+                  lostRight = 0;
+                  PWMSetSteer(1150);
+                  delayms(1000);
+                  lstatus = 0;
                 }
               }
             
@@ -1083,7 +1236,7 @@ void LQMT9V034_Init(void)
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE_REG, 0x0303);   //0xAF  AEC/AGC A~bit0:1AE;bit1:1AG/B~bit2:1AE;bit3:1AG
   
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MIN_EXPOSURE_REG, 0x0400);     //0xAC  最小粗快门宽度   0x0001
-  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_EXPOSURE_REG, 0x0400);     //0xAD  最大醋快门宽度   0x01E0-480
+  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_EXPOSURE_REG, 0x0480);     //0xAD  最大醋快门宽度   0x01E0-480
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_GAIN_REG, 60);             //0xAB  最大模拟增益     64
   
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AGC_AEC_PIXEL_COUNT_REG, 188*120);//0xB0  用于AEC/AGC直方图像素数目,最大44000   4096=320*240  

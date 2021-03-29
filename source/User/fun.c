@@ -41,6 +41,8 @@ unsigned int const data_table[H]={
 193,196,199,202,205,208,211,214,217,220
 };//需采集数据的行
 uint8 Cmp=160;	//黑线阈值
+uint8 lastCmp = 160;
+uint8 haveinited = 0;
 uint8 mid_before = 94; //上一时刻中线
 uint8 row_F[H];	//该行采集完成标志
 char startline_F;	//发现起始行
@@ -4396,6 +4398,7 @@ void delay2()
 
 
 
+
 /*******************************************************************************
 函数名称：find_edge
 函数功能: 先寻找Cmp，再寻找边缘，然后寻找中心线
@@ -4405,7 +4408,22 @@ void delay2()
 void find_edge()
 {
   
-            Cmp = GetOSTU(Image_Data);
+            if(!haveinited)
+            {
+              lastCmp = GetOSTU(Image_Data);
+              haveinited = 1;
+            }
+
+            uint8 tmp = GetOSTU(Image_Data);
+            if(tmp > lastCmp)
+            {
+              lastCmp++;
+            }
+            else if(tmp < lastCmp)
+            {
+              lastCmp--;
+            }
+            Cmp = lastCmp;
            // uart_printf(test_port,"Cmp = %d \n",Cmp);
   
                         for(int line=0;line<H;line++)
