@@ -560,9 +560,9 @@ void Test_Print_JudgeRoad(void)
 void SendPicture(void)
 {
   
-    uart_putchar(test_port, 0x01);
+  uart_putchar(test_port, 0x01);
   uart_putchar(test_port, 0xFE);
-  /*for (int i = 0; i < IMAGEH; i++) 
+  for (int i = 0; i < IMAGEH; i++) 
   { 
     for (int j = 0; j < IMAGEW; j++) 
     { 
@@ -577,7 +577,7 @@ void SendPicture(void)
         uart_putchar(test_port,0x00);
       }
     } 
-  } */
+  } 
   
   int i = 0, j = 0;
 
@@ -586,7 +586,7 @@ void SendPicture(void)
   {
     for(j=0;j<IMAGEW;j++)    //输出从第0列到列，用户可以选择性的输出合适的列数
     {
-      uart_putchar(test_port,Image_Data[i][j]);
+      //uart_putchar(test_port,Image_Data[i][j]);
     }
   }
   uart_putchar (test_port, 0xFE);
@@ -621,11 +621,14 @@ int rstatus = 0;
 int lstatus = 0;
 int havestop = 0;
 int incross = 0;
+int cnt_gzp = 0;
 
 int Mmin(int a,int b)
 {
   return a<b?a:b;
 }
+
+
 
 void imagineProcess(void)
 {
@@ -644,7 +647,7 @@ void imagineProcess(void)
           exti_disable(PTD15); //场中断关闭 
           
           clearDelPar();//清零处理参数
-          SendPicture();
+         //SendPicture();
           find_edge();//
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
@@ -654,7 +657,8 @@ void imagineProcess(void)
             delayms(50);
           }
          uart_printf(UART_0,"\n\n");*/
-          ele_direction_control();      
+          ele_direction_control(); 
+          cnt_gzp += 1;
           
           
           /*for(j = 0;j<V-1;j++)
@@ -819,11 +823,12 @@ void imagineProcess(void)
               {
                 delayms(200);
                 PWMSetSteer(850);
-                delayms(800);
+                delayms(600);
+                cnt_gzp = 0;
                 rstatus = 4;
               }
               
-              if(rstatus==4)
+              if(rstatus==4 && cnt_gzp>100)
               {
                 int lostLeft = 0;
                 int leftVal = 0;
@@ -841,7 +846,7 @@ void imagineProcess(void)
                 {
                   lostLeft = 0;
                   PWMSetSteer(850);
-                  delayms(1000);
+                  delayms(800);
                   rstatus = 0;
                 }
               }
@@ -980,9 +985,10 @@ void imagineProcess(void)
                 PWMSetSteer(1150);
                 delayms(600);
                 lstatus = 4;
+                cnt_gzp = 0;
               }
               
-              if(lstatus==4)
+              if(lstatus==4 && cnt_gzp>100)
               {
                 int lostRight = 0;
                 int rightVal = 0;
@@ -1000,7 +1006,7 @@ void imagineProcess(void)
                 {
                   lostRight = 0;
                   PWMSetSteer(1150);
-                  delayms(1000);
+                  delayms(800);
                   lstatus = 0;
                 }
               }
@@ -1235,7 +1241,7 @@ void LQMT9V034_Init(void)
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_ROW_NOISE_CORR_CTRL_REG, 0);   //0x70  0x0000 
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE_REG, 0x0303);   //0xAF  AEC/AGC A~bit0:1AE;bit1:1AG/B~bit2:1AE;bit3:1AG
   
-  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MIN_EXPOSURE_REG, 0x0400);     //0xAC  最小粗快门宽度   0x0001
+  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MIN_EXPOSURE_REG, 0x0380);     //0xAC  最小粗快门宽度   0x0001
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_EXPOSURE_REG, 0x0480);     //0xAD  最大醋快门宽度   0x01E0-480
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_GAIN_REG, 60);             //0xAB  最大模拟增益     64
   

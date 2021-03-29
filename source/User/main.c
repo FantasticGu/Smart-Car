@@ -21,7 +21,7 @@ void main()
   
   DisableInterrupts;
   pit_init(PIT0, 10);
-  uart_init(test_port, 115200); 
+  uart_init(test_port, 256000); 
   LQMT9V034_Init();                         
   ftm_quad_init(FTM1);
   ftm_quad_init(FTM2);//ftm正交解码计数初始化

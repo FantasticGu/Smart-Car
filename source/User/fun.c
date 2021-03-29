@@ -4407,13 +4407,6 @@ void delay2()
 
 void find_edge()
 {
-  
-            if(!haveinited)
-            {
-              lastCmp = GetOSTU(Image_Data);
-              haveinited = 1;
-            }
-
             uint8 tmp = GetOSTU(Image_Data);
             if(tmp > lastCmp)
             {
@@ -4424,6 +4417,7 @@ void find_edge()
               lastCmp--;
             }
             Cmp = lastCmp;
+            //Cmp =  GetOSTU(Image_Data);
            // uart_printf(test_port,"Cmp = %d \n",Cmp);
   
                         for(int line=0;line<H;line++)

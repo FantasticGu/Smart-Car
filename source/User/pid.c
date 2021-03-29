@@ -254,12 +254,12 @@ void ele_direction_control()
                 
         if(-15>dir_error>-35)
         {
-            dir_control_P=9;
+            dir_control_P=11;
             dir_P_value=dir_control_P*dir_error;
         }
         if(-8>=dir_error>=-15)
         {
-            dir_control_P=6;
+            dir_control_P=8;
             dir_P_value=dir_control_P*dir_error;
         }
         if(-2>dir_error>-8)
@@ -282,11 +282,11 @@ void ele_direction_control()
         }
         else if(8<dir_error<15)
         {
-            dir_control_P=6;
+            dir_control_P=8;
             dir_P_value=dir_control_P*dir_error;
         }else
         {
-          dir_control_P=10;
+          dir_control_P=12;
           dir_P_value=dir_control_P*dir_error;
           
         }
