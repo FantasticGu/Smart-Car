@@ -823,20 +823,6 @@ void imagineProcess(void)
             
           }
                     
-          /*if(rstatus == 6)
-          {
-            static int cnt_6 = 0;
-            cnt_6++;
-            if(cnt_6>10)
-            {
-              if(judgeRight(25,35,180) == 1)
-              {
-                cnt_6 = 0;
-                rstatus = 7;
-              }
-            }
-            
-          }*/
               
           if(rstatus == 7)
           {
@@ -861,7 +847,7 @@ void imagineProcess(void)
                 int p3 = 0;
                 for(int j = H-11;j>H-14;j--)
                 {
-                  if (Bline_right[j]<168)
+                  if (Bline_right[j]<173)
                   {
                      p1 = Bline_right[j];
                      break;
@@ -870,7 +856,7 @@ void imagineProcess(void)
                 } 
                 for(int j = H-19;j>H-22;j--)
                 {
-                  if (Bline_right[j]<163)
+                  if (Bline_right[j]<168)
                   {
                      p2 = Bline_right[j];
                      break;
@@ -879,7 +865,7 @@ void imagineProcess(void)
                 } 
                 for(int j = H-26;j>H-30;j--)
                 {
-                  if (Bline_right[j]<158)
+                  if (Bline_right[j]<163)
                   {
                      p3 = Bline_right[j];
                      break;
@@ -891,7 +877,7 @@ void imagineProcess(void)
                   int r = 0;
                   for(int j = H-11;j>H-41;j--)
                   {
-                    if(Bline_right[j]<165)
+                    if(Bline_right[j]<163)
                     {
                       r++;
                     }
@@ -906,15 +892,19 @@ void imagineProcess(void)
               {
                 static int cnt_1 = 0;
                 cnt_1++;
-                if(cnt_1 > 20)
+                for(int i = H-11;i>H-41;i--)
                 {
-                  cnt_1 = 0;
-                  lstatus = 0;
+                  Pick_table[i] = Bline_right[i]-60;
                 }
-                if(judgeLeft(35,45,30) == 1)
+                if(judgeLeft(35,45,23) == 1)
                 {
                   cnt_1 = 0;
                   lstatus = 2;
+                }
+                  if(cnt_1 > 25)
+                {
+                  cnt_1 = 0;
+                  lstatus = 0;
                 }
                 
               }
@@ -927,7 +917,7 @@ void imagineProcess(void)
                   cnt_2 = 0;
                   lstatus = 0;
                 }
-                if(judgeLeft(25,35,15) == 0)
+                if(judgeLeft(25,35,10) == 0)
                 {
                   cnt_2 = 0;
                   lstatus = 3;
@@ -940,9 +930,9 @@ void imagineProcess(void)
                 cnt_3++;
                  for(int i = H-11;i>H-41;i--)
                 {
-                  Pick_table[i] = Bline_left[i]+50;
+                  Pick_table[i] = Bline_left[i]+45;
                 }
-                if(cnt_3 > 20)
+                if(cnt_3 > 10)
                 {
                     cnt_3 = 0;
                     lstatus = 4;
@@ -959,34 +949,25 @@ void imagineProcess(void)
                   if(judgeRight(15,25,180) == 1)
                   {
                     cnt_4 = 0;
-                    PWMSetSteer(1150);
-                    delayms(400);
                     lstatus = 5;
                   }   
                 }
               }
               if(lstatus == 5)
               {
-                if(judgeRight(35,45,150)==0)
+                static int cnt_5 = 0;
+                cnt_5++;
+                for(int i = H-11;i>H-41;i--)
                 {
-                  lstatus = 6;
+                  Pick_table[i] = Bline_left[i]+50;
+                }
+                if(cnt_5>20 && judgeRight(25,35,170)==0)
+                {
+                  cnt_5 = 0;
+                  lstatus = 7;
                 }
               }
-              if(lstatus == 6)
-              {
-                static int cnt_6 = 0;
-                cnt_6++;
-                if(cnt_6>10)
-                {
-                  if(judgeLeft(25,35,15) == 0)
-                  {
-                    cnt_6 = 0;
-                    lstatus = 7;
-                  }
-                }
                 
-                
-              }
               
               if(lstatus == 7)
               {
@@ -1003,12 +984,23 @@ void imagineProcess(void)
                 }
               }
             
-            
-           if(judgeLeft(15,35,5)==0 && judgeRight(15,35,183)==1 && !lstatus && !rstatus)
+           static int cnt_cross = 0;
+           if(cnt_cross < 200)
            {
-             PWMSetSteer(990);
-             delayms(500);
-             
+             cnt_cross++;
+           }
+           if(cnt_cross > 100 && judgeLeft(15,35,5)==0 && judgeRight(15,35,183)==1 && lstatus<2 && rstatus<2)
+           {
+             lstatus = rstatus = 0;
+           }
+           
+           if(!rstatus && !lstatus)
+           {
+             setpoint1 = setpoint2 = 700;
+           }
+           else
+           {
+             setpoint1 = setpoint2 = 550;
            }
             
       
@@ -1020,10 +1012,9 @@ void imagineProcess(void)
           Field_Over_Flag= 0; 
    
      }
-  
-
   }
-}
+
+ }
 
 
 

@@ -131,8 +131,8 @@ void  pid_compute(pid_t pid)
 }
 
 float in1,out1,in2,out2,lastin1,lastin2=0;
-float setpoint1=550;
-float setpoint2=550;
+float setpoint1=700;
+float setpoint2=700;
 float p1=7.0;
 float p2=7.0;
 float i1=0.5;
