@@ -131,14 +131,14 @@ void  pid_compute(pid_t pid)
 }
 
 float in1,out1,in2,out2,lastin1,lastin2=0;
-float setpoint1=350;
-float setpoint2=350;
-float p1=0.9;
-float p2=0.9;
-float i1=1.1;
-float i2=1.1;
-float d1=0.2;
-float d2=0.2;
+float setpoint1=550;
+float setpoint2=550;
+float p1=7.0;
+float p2=7.0;
+float i1=0.5;
+float i2=0.5;
+float d1=0.3;
+float d2=0.3;
 float max_speed=7000;
 float min_speed=-3000;
 float iterm1=0;
@@ -235,7 +235,7 @@ void ele_direction_control()
     1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,
 };  
-        int i = H-11;
+        int i = H-21;
         ADresult0 = 0;
         
         for(;i>H-41;i--)
@@ -243,8 +243,8 @@ void ele_direction_control()
           ADresult0 += Pick_table[i];     
         }
         
-        ADresult1 = NUMPIX*15;
-        dir_error = (int)(ADresult0-ADresult1)/30;
+        ADresult1 = NUMPIX*10;
+        dir_error = (int)(ADresult0-ADresult1)/20;
         
 	 
         //uart_printf(UART_0,"dir_error =  %d\n",dir_error);
@@ -275,9 +275,9 @@ void ele_direction_control()
         {
             dir_control_P=4;
             dir_P_value=dir_control_P*dir_error;
-        }else if(15<=dir_error<=25)
+        }else if(15<=dir_error<=35)
         {
-            dir_control_P=6;
+            dir_control_P=11;
             dir_P_value=dir_control_P*dir_error;
         }
         else if(8<dir_error<15)
@@ -286,14 +286,14 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
         }else
         {
-          dir_control_P=12;
+          dir_control_P=20;
           dir_P_value=dir_control_P*dir_error;
           
         }
         
         
-        if(dir_P_value<-140)dir_P_value=-140;
-        if(dir_P_value>140)dir_P_value=140;
+        if(dir_P_value<-150)dir_P_value=-150;
+        if(dir_P_value>150)dir_P_value=150;
         
         //uart_printf(UART_0,"output = %f\n",dir_P_value);
         
