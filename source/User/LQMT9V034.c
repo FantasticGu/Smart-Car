@@ -832,7 +832,7 @@ void imagineProcess(void)
             {
               Pick_table[i] = Bline_left[i]+50;
             }
-            if(cnt_7 > 30)
+            if(cnt_7 > 20)
             {
               cnt_7 = 0;
               rstatus = 0;
@@ -977,30 +977,46 @@ void imagineProcess(void)
                 {
                   Pick_table[i] = Bline_right[i]-50;
                 }
-                if(cnt_7 > 30)
+                if(cnt_7 > 20)
                 {
                   cnt_7 = 0;
                   lstatus = 0;
                 }
               }
             
-           static int cnt_cross = 0;
+          static int cnt_cross = 0;
+          static int cstatus = 0;
            if(cnt_cross < 200)
            {
              cnt_cross++;
            }
            if(cnt_cross > 100 && judgeLeft(15,35,5)==0 && judgeRight(15,35,183)==1 && lstatus<2 && rstatus<2)
            {
+             cstatus = 1;
              lstatus = rstatus = 0;
            }
-           
-           if(!rstatus && !lstatus)
+           if(cstatus)
            {
-             setpoint1 = setpoint2 = 700;
+             static int cnt_c = 0;
+             cnt_c++;
+             if(cnt_c > 20)
+             {
+               cnt_c = 0;
+               cstatus = 0;
+             }
+           }
+           
+           if(!rstatus && !lstatus && !cstatus)
+           {
+             setpoint1 = setpoint2 = NORMAL_SPEED;
+           }
+           else if(!rstatus)
+           {
+             setpoint1 = setpoint2 = CIRCLE_SPEED;
            }
            else
            {
-             setpoint1 = setpoint2 = 550;
+             setpoint1 = setpoint2 = CROSS_SPEED;
            }
             
       

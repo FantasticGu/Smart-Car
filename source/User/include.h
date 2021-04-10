@@ -59,6 +59,10 @@ typedef struct
 #define BW_DIFF 15  //黑线阈值与白色灰度值差
 #define JUDGE_DIFF 10	//判断黑线是否有效斜率判断差值
 
+#define NORMAL_SPEED 700
+#define CIRCLE_SPEED 550
+#define CROSS_SPEED 650
+
 #define KEY1 0x01
 #define KEY2 0x02
 #define KEY3 0x03

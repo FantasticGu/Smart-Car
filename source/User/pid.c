@@ -131,8 +131,8 @@ void  pid_compute(pid_t pid)
 }
 
 float in1,out1,in2,out2,lastin1,lastin2=0;
-float setpoint1=700;
-float setpoint2=700;
+float setpoint1=NORMAL_SPEED;
+float setpoint2=NORMAL_SPEED;
 float p1=7.0;
 float p2=7.0;
 float i1=0.5;
@@ -254,12 +254,12 @@ void ele_direction_control()
                 
         if(-15>dir_error>-35)
         {
-            dir_control_P=11;
+            dir_control_P=12;
             dir_P_value=dir_control_P*dir_error;
         }
         if(-8>=dir_error>=-15)
         {
-            dir_control_P=8;
+            dir_control_P=10;
             dir_P_value=dir_control_P*dir_error;
         }
         if(-2>dir_error>-8)
@@ -277,12 +277,12 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
         }else if(15<=dir_error<=35)
         {
-            dir_control_P=11;
+            dir_control_P=12;
             dir_P_value=dir_control_P*dir_error;
         }
         else if(8<dir_error<15)
         {
-            dir_control_P=8;
+            dir_control_P=10;
             dir_P_value=dir_control_P*dir_error;
         }else
         {
