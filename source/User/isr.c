@@ -23,21 +23,6 @@ void UART0_ISR(void)
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_RDRF_MASK)   //接收数据寄存器满
   {
     Data=uart_getchar(UART_0);
-    switch(Data)
-    {
-     case '1':
-      uart_printf(UART_0,"233");
-      break;
-    case '2':
-      PWMSetSteer(900);
-      break;
-    case '3':
-      PWMSetMotor2(3000,3000);
-      break;
-    case '4':
-      PWMSetMotor2(4000,4000);
-      break;
-    }
   }
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_TDRE_MASK)  //发送数据寄存器空
   {

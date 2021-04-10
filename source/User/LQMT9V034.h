@@ -75,7 +75,6 @@ extern void MT9V034_SetFrameRate(uint8_t frameRate);
 extern void MT9V034_SetFrameResolution(uint16_t height,uint16_t width);
 extern void MT9V034_SetAutoExposure(char enable);
 
-void UARTSendPicture(uint8_t tmImage[IMAGEH][IMAGEW]) ;
 uint8_t GetOSTU(uint8 tmImage[IMAGEH][IMAGEW]) ;
 void BinaryImage(uint8_t tmImage[IMAGEH][IMAGEW],uint8_t ThresholdV) ; 
 

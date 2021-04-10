@@ -2603,22 +2603,16 @@
     <group>
         <name>User</name>
         <group>
-            <name>LQ_I2C</name>
+            <name>Image</name>
             <file>
-                <name>$PROJ_DIR$\source\User\u_iic.c</name>
+                <name>$PROJ_DIR$\source\User\Image.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\source\User\u_iic.h</name>
+                <name>$PROJ_DIR$\source\User\Image.h</name>
             </file>
-        </group>
-        <group>
-            <name>MPU6050</name>
-            <file>
-                <name>$PROJ_DIR$\source\User\LQIIC6050.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\source\User\LQMPU6050.h</name>
-            </file>
+            <configuration>
+                <name>Debug</name>
+            </configuration>
         </group>
         <group>
             <name>V034</name>
@@ -2629,12 +2623,6 @@
                 <name>$PROJ_DIR$\source\User\LQMT9V034.h</name>
             </file>
         </group>
-        <file>
-            <name>$PROJ_DIR$\source\User\duoji_ctl.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\source\User\duoji_ctl.h</name>
-        </file>
         <file>
             <name>$PROJ_DIR$\source\User\fun.c</name>
         </file>
@@ -2662,5 +2650,8 @@
         <file>
             <name>$PROJ_DIR$\source\User\variable.h</name>
         </file>
+        <configuration>
+            <name>Debug</name>
+        </configuration>
     </group>
 </project>
