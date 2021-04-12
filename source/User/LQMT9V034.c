@@ -149,12 +149,10 @@ int judgeLeft(int begin,int end,int val)
   
 }
 
+int speedflag = 0;
 
 void imagineProcess(void)
 {
- 
-
-  //setbinary();
     
   while(1)
   {  
@@ -164,7 +162,7 @@ void imagineProcess(void)
           exti_disable(PTD15); //场中断关闭 
           
           
-         //SendPicture();
+         // SendPicture();
           find_edge();//
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
@@ -269,7 +267,7 @@ void imagineProcess(void)
               cnt_3++;
                for(int i = H-11;i>H-41;i--)
               {
-                Pick_table[i] = Bline_right[i]-45;
+                Pick_table[i] = Bline_right[i]-40;
               }
               if(cnt_3 > 10)
               {
@@ -389,7 +387,7 @@ void imagineProcess(void)
                   cnt_1 = 0;
                   lstatus = 2;
                 }
-                  if(cnt_1 > 25)
+                  if(cnt_1 > 35)
                 {
                   cnt_1 = 0;
                   lstatus = 0;
@@ -397,10 +395,10 @@ void imagineProcess(void)
                 
               }
               if(lstatus == 2)
-              {
+              {               
                 static int cnt_2 = 0;
                 cnt_2++;
-                if(cnt_2 > 20)
+                if(cnt_2 > 25)
                 {
                   cnt_2 = 0;
                   lstatus = 0;
@@ -413,12 +411,12 @@ void imagineProcess(void)
                 
               }
               if(lstatus==3)
-              {
+              {;
                 static int cnt_3 = 0;
                 cnt_3++;
                  for(int i = H-11;i>H-41;i--)
                 {
-                  Pick_table[i] = Bline_left[i]+45;
+                  Pick_table[i] = Bline_left[i]+40;
                 }
                 if(cnt_3 > 10)
                 {
@@ -434,7 +432,7 @@ void imagineProcess(void)
                 if(cnt_4>50)
                 {
 
-                  if(judgeRight(15,25,180) == 1)
+                  if(judgeRight(15,25,170) == 1)
                   {
                     cnt_4 = 0;
                     lstatus = 5;
@@ -482,6 +480,7 @@ void imagineProcess(void)
            {
              cstatus = 1;
              lstatus = rstatus = 0;
+             
            }
            if(cstatus)
            {
@@ -494,23 +493,66 @@ void imagineProcess(void)
              }
            }
            
+                 ele_direction_control();
+           
            if(!rstatus && !lstatus && !cstatus)
            {
-             setpoint1 = setpoint2 = NORMAL_SPEED;
+             if(speedflag != 1)
+             {
+                setpoint1 = setpoint2 = NORMAL_SPEED;
+                speedflag = 1;
+               
+             }
            }
-           else if(!rstatus)
+           else if(!cstatus)
            {
-             setpoint1 = setpoint2 = CIRCLE_SPEED;
+             if(speedflag != 2)
+             {
+                setpoint1 = setpoint2 = CIRCLE_SPEED;
+                speedflag = 2;
+               
+             }
            }
            else
            {
-             setpoint1 = setpoint2 = CROSS_SPEED;
+             if(speedflag != 3)
+             {
+                setpoint1 = setpoint2 = CROSS_SPEED;
+                PWMSetSteer(990);
+                speedflag = 3;
+               
+             }
            }
+           
+           static int havestop = 0;
+          int jumppoint = 0;
+          if(!havestop)
+          {
+            for(int i = H-11;i>H-41;i--)
+            {
+              for(int j = V-10;j>V-185;j--)
+              {
+                if(Image_Data[i][j-2]>Cmp && Image_Data[i][j-1]>Cmp 
+                  && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp )
+                {
+                  jumppoint++;
+                }
+              }
+              if(jumppoint > 5)
+              {
+                setpoint1 = setpoint2 = 0;
+                delayms(2000000);
+                havestop = 1;
+              }
+                jumppoint = 0;
+            }
+          }
+          
             
       
           //uart_printf(UART_0,"right = %d\n",readyright);
   
-          ele_direction_control();
+
           
           exti_enable(PTD15,IRQ_FALLING|PULLUP);    //场中断 
           Field_Over_Flag= 0; 

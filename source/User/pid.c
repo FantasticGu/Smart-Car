@@ -14,8 +14,8 @@ extern uint16 bigbendflag;
 float in1,out1,in2,out2,lastin1,lastin2=0;
 float setpoint1=NORMAL_SPEED;
 float setpoint2=NORMAL_SPEED;
-float p1=7.0;
-float p2=7.0;
+float p1=10.0;
+float p2=10.0;
 float i1=0.5;
 float i2=0.5;
 float d1=0.3;
@@ -120,34 +120,68 @@ void ele_direction_control()
         {
             dir_control_P=12;
             dir_P_value=dir_control_P*dir_error;
+            if(speedflag == 1)
+            {
+              setpoint1 = NORMAL_SPEED+10*dir_error;
+                setpoint2 = NORMAL_SPEED;
+            }
         }
         if(-8>=dir_error>=-15)
         {
             dir_control_P=10;
             dir_P_value=dir_control_P*dir_error;
+            if(speedflag == 1)
+            {
+              setpoint1 = NORMAL_SPEED+8*dir_error;
+                setpoint2 = NORMAL_SPEED;
+            }
         }
         if(-2>dir_error>-8)
         {
             dir_control_P=4;
             dir_P_value=dir_control_P*dir_error;
+            if(speedflag == 1)
+            {
+              setpoint1 = NORMAL_SPEED+6*dir_error;
+                setpoint2 = NORMAL_SPEED;
+            }
         } 
         else if(-2<=dir_error&&dir_error<=2)
         {
             dir_control_P=0;
             dir_P_value=dir_control_P*dir_error;
+            if(speedflag == 1)
+            {
+              setpoint1 = setpoint2 = NORMAL_SPEED;
+            }
         }else if(2<dir_error<8)
         {
             dir_control_P=4;
             dir_P_value=dir_control_P*dir_error;
+           if(speedflag == 1)
+            {
+              setpoint2 = NORMAL_SPEED-6*dir_error;
+                setpoint1 = NORMAL_SPEED;
+            }
         }else if(15<=dir_error<=35)
         {
             dir_control_P=12;
             dir_P_value=dir_control_P*dir_error;
+            if(speedflag == 1)
+            {
+              setpoint2 = NORMAL_SPEED-8*dir_error;
+              setpoint1 = NORMAL_SPEED;
+            }
         }
         else if(8<dir_error<15)
         {
             dir_control_P=10;
             dir_P_value=dir_control_P*dir_error;
+            if(speedflag == 1)
+            {
+              setpoint2 = NORMAL_SPEED-10*dir_error;
+              setpoint1 = NORMAL_SPEED;
+            }
         }else
         {
           dir_control_P=20;

@@ -48,9 +48,9 @@ typedef struct
 #define  V 188  //每行采集点数
 //#define Cmp 160//摄像头二值化阈值
 
-#define NORMAL_SPEED 700
-#define CIRCLE_SPEED 550
-#define CROSS_SPEED 650
+#define NORMAL_SPEED 720
+#define CIRCLE_SPEED 600
+#define CROSS_SPEED 680
 
 #define KEY1 0x01
 #define KEY2 0x02
@@ -98,6 +98,8 @@ extern uint16 Bline_left[H];	 //左边线存放数组
 extern uint16 Bline_right[H];	 //右边线存放数组
 extern uint16 Pick_table[H];	 //中心线存放数组
 extern uint8 Cmp;	//黑线阈值
+
+extern int speedflag; 
 
 
 

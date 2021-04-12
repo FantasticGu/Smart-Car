@@ -8,8 +8,8 @@ unsigned int row=0;	//摄像头行计数，最大240
 uint16 Bline_left[H];	 //左边线存放数组
 uint16 Bline_right[H];	 //右边线存放数组
 uint16 Pick_table[H];	 //中心线存放数组
-uint8 Cmp=160;	//黑线阈值
-uint8 lastCmp=160;
+uint8 Cmp=180;	//黑线阈值
+uint8 lastCmp=180;
 
 
 

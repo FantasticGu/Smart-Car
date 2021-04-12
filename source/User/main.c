@@ -21,13 +21,13 @@ void main()
   
   DisableInterrupts;
   pit_init(PIT0, 10);
-  uart_init(test_port, 256000); 
+  //uart_init(test_port, 256000); 
   LQMT9V034_Init();                         
   ftm_quad_init(FTM1);
   ftm_quad_init(FTM2);//ftm正交解码计数初始化
   motor_init();                                    //电机初始化
   steer_init();
-  uart_rx_irq_en(UART_0);
+  //uart_rx_irq_en(UART_0);
   pit_irq_en(PIT0);
   EnableInterrupts;
   imagineProcess();
