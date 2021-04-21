@@ -69,7 +69,7 @@ void SendPicture(void)
   
   uart_putchar(test_port, 0x01);
   uart_putchar(test_port, 0xFE);
-  for (int i = 0; i < IMAGEH; i++) 
+  /*for (int i = 0; i < IMAGEH; i++) 
   { 
     for (int j = 0; j < IMAGEW; j++) 
     { 
@@ -84,7 +84,7 @@ void SendPicture(void)
         uart_putchar(test_port,0x00);
       }
     } 
-  } 
+  }*/ 
   
   int i = 0, j = 0;
 
@@ -93,7 +93,7 @@ void SendPicture(void)
   {
     for(j=0;j<IMAGEW;j++)    //输出从第0列到列，用户可以选择性的输出合适的列数
     {
-      //uart_putchar(test_port,Image_Data[i][j]);
+      uart_putchar(test_port,Image_Data[i][j]);
     }
   }
   uart_putchar (test_port, 0xFE);
@@ -162,7 +162,7 @@ void imagineProcess(void)
           exti_disable(PTD15); //场中断关闭 
           
           
-         // SendPicture();
+          //SendPicture();
           find_edge();//
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);

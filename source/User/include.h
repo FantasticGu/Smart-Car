@@ -48,9 +48,9 @@ typedef struct
 #define  V 188  //每行采集点数
 //#define Cmp 160//摄像头二值化阈值
 
-#define NORMAL_SPEED 720
+#define NORMAL_SPEED 700
 #define CIRCLE_SPEED 600
-#define CROSS_SPEED 680
+#define CROSS_SPEED 650
 
 #define KEY1 0x01
 #define KEY2 0x02
