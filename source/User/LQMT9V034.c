@@ -69,7 +69,7 @@ void SendPicture(void)
   
   uart_putchar(test_port, 0x01);
   uart_putchar(test_port, 0xFE);
-  /*for (int i = 0; i < IMAGEH; i++) 
+  for (int i = 0; i < IMAGEH; i++) 
   { 
     for (int j = 0; j < IMAGEW; j++) 
     { 
@@ -84,7 +84,7 @@ void SendPicture(void)
         uart_putchar(test_port,0x00);
       }
     } 
-  }*/ 
+  }
   
   int i = 0, j = 0;
 
@@ -93,7 +93,7 @@ void SendPicture(void)
   {
     for(j=0;j<IMAGEW;j++)    //输出从第0列到列，用户可以选择性的输出合适的列数
     {
-      uart_putchar(test_port,Image_Data[i][j]);
+      //uart_putchar(test_port,Image_Data[i][j]);
     }
   }
   uart_putchar (test_port, 0xFE);
@@ -162,13 +162,13 @@ void imagineProcess(void)
           exti_disable(PTD15); //场中断关闭 
           
           
-          //SendPicture();
+          SendPicture();
           find_edge();//
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
           
           
-         /*for(;i>H-41;i--)
+         /*for(int i = H -21;i>H-41;i--)
           {
             uart_printf(UART_0,"%d %d %d \n",Bline_left[i],Pick_table[i],Bline_right[i]);
             delayms(50);
@@ -411,7 +411,7 @@ void imagineProcess(void)
                 
               }
               if(lstatus==3)
-              {;
+              {
                 static int cnt_3 = 0;
                 cnt_3++;
                  for(int i = H-11;i>H-41;i--)
@@ -472,6 +472,65 @@ void imagineProcess(void)
             
           static int cnt_cross = 0;
           static int cstatus = 0;
+       
+          static int cnt_angle = 0;
+          static int angle_status = 0;
+          if(cnt_angle >= 10)
+          {
+            cnt_angle++;
+            if(cnt_angle > 100)
+            {
+              cnt_angle = 0;
+            }
+          }
+          if(judgeLeft(25,35,10)==0 && judgeRight(25,35,180)==1
+             && !lstatus && !rstatus && cnt_angle < 10)
+          {
+            angle_status = 1;
+            cnt_angle++;
+             int jumpl=94,jumpr=94;
+             int matchpointl = 0,matchpointr = 0;
+             for(int i = H-61;i>H-71;i--)
+             {
+               for(int j = 30;j<V/2-1;j++)
+               {
+                 if(Image_Data[i][j-2] > Cmp &&Image_Data[i][j-1] > Cmp 
+                    && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp 
+                    && j < jumpl)
+                 {
+                   matchpointl++;
+                   if(jumpl-j<20)
+                   {
+                   jumpl = j;
+                   }
+                   continue;
+                 }
+               }
+               for(int j = V-30;j>V/2+1;j--)
+               {
+                 if(Image_Data[i][j-2] < Cmp &&Image_Data[i][j-1] < Cmp 
+                    && Image_Data[i][j]>Cmp && Image_Data[i][j+1]>Cmp
+                    && j>=jumpr )
+                 {
+                   matchpointr++;
+                   if(j - jumpr < 20)
+                   {
+                     jumpr = j;
+                   }
+
+                   continue;
+                 }
+               }
+             }
+             if(matchpointl > 5 && matchpointr > 5)
+             {
+               setpoint1 = setpoint2 = 0;
+               delayms(10000);
+             }
+          }
+          
+          
+          
            if(cnt_cross < 200)
            {
              cnt_cross++;
@@ -493,7 +552,9 @@ void imagineProcess(void)
              }
            }
            
-                 ele_direction_control();
+           
+           
+            
            
            if(!rstatus && !lstatus && !cstatus)
            {
@@ -524,11 +585,26 @@ void imagineProcess(void)
              }
            }
            
-           static int havestop = 0;
-          int jumppoint = 0;
-          if(!havestop)
+           
+          static int start_cnt = 0;
+          if(start_cnt <= 300)
           {
-            for(int i = H-11;i>H-41;i--)
+            start_cnt++;
+            if(start_cnt < 50)
+            {
+              for(int i = H-21;i>H-41;i--)
+              {
+                 Pick_table[i] = Bline_left[i]+50;
+              }
+            }
+          }
+           
+          static int havestop = 0;
+          static int stopflag = 0;
+          int jumppoint = 0;
+          if(!havestop && start_cnt > 200)
+          {
+            for(int i = H-41;i>H-61;i--)
             {
               for(int j = V-10;j>V-185;j--)
               {
@@ -538,21 +614,84 @@ void imagineProcess(void)
                   jumppoint++;
                 }
               }
-              if(jumppoint > 5)
+              if(jumppoint > 8)
               {
-                setpoint1 = setpoint2 = 0;
-                delayms(2000000);
-                havestop = 1;
+                if(!stopflag)
+                {
+                  stopflag = 3;
+                  break;
+                }
+                else
+                {
+                  stopflag = 3;
+                  break;
+                }
               }
                 jumppoint = 0;
+                if(stopflag)
+                {
+                  break;
+                }
             }
+          }
+          
+          if(stopflag == 1)
+          {
+             static int stop_cnt = 0;
+             for(int i = H-21;i>H-41;i--)
+             {
+                Pick_table[i] = Bline_right[i]-50;
+             }
+             stop_cnt++;
+             if(stop_cnt>30)
+             {
+               stop_cnt = 0;
+               stopflag = 2;
+             }
+          }
+          
+          if(stopflag == 3)
+          {
+             static int black_cnt = 0;
+             for(int i = H-21;i>H-41;i--)
+             {
+                Pick_table[i] = Bline_left[i]+60;
+             }
+             black_cnt++;
+             if(black_cnt>20)
+             {
+               havestop=1;
+               setpoint1 = setpoint2 = 0;
+               delayms(100000);
+             }
+             /*for(int i = H-51;i>H-61;i--)
+             {
+                int black_line_cnt = 0; 
+                for(int j = 0;j<188;j++)
+                {
+                  if(Image_Data[i][j]<Cmp)
+                  {
+                    black_line_cnt++;
+                  }
+                }
+                if(black_line_cnt > 160)
+                {
+                  black_cnt++;
+                }
+                if(black_cnt > 1)
+                {
+                  havestop=1;
+                  setpoint1=setpoint2=0;
+                  delayms(100000);
+                }
+             }*/
           }
           
             
       
           //uart_printf(UART_0,"right = %d\n",readyright);
   
-
+         ele_direction_control();
           
           exti_enable(PTD15,IRQ_FALLING|PULLUP);    //场中断 
           Field_Over_Flag= 0; 

@@ -19,6 +19,9 @@
 void main()
 {
   
+  
+  //todo: change tha algo in 大津法 to 计算新的阈值
+  
   DisableInterrupts;
   pit_init(PIT0, 10);
   uart_init(test_port, 256000); 

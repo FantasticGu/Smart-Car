@@ -1,0 +1,59 @@
+ /*  static int cnt_angle = 0;
+          static int angle_status = 0;
+          if(cnt_angle >= 10)
+          {
+            cnt_angle++;
+            if(cnt_angle > 100)
+            {
+              cnt_angle = 0;
+            }
+          }
+          if(judgeLeft(15,35,10)==0 && judgeRight(15,35,180)==1
+             && !lstatus && !rstatus && cnt_angle < 10)
+          {
+            angle_status = 1;
+            cnt_angle++;
+          int jumpl=94,jumpr=94;
+             int matchpointl = 0,matchpointr = 0;
+             for(int i = H-61;i>H-71;i--)
+             {
+               for(int j = 40;j<V/2-1;j++)
+               {
+                 if(Image_Data[i][j-2] > Cmp &&Image_Data[i][j-1] > Cmp 
+                    && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp 
+                    && j < jumpl)
+                 {
+                   matchpointl++;
+                   if(jumpl-j<20)
+                   {
+                   jumpl = j;
+                   }
+                   continue;
+                 }
+               }
+               for(int j = V-40;j>V/2+1;j--)
+               {
+                 if(Image_Data[i][j-2] < Cmp &&Image_Data[i][j-1] < Cmp 
+                    && Image_Data[i][j]>Cmp && Image_Data[i][j+1]>Cmp
+                    && j>=jumpr    )
+                 {
+                   matchpointr++;
+                   if(j - jumpr < 20)
+                   {
+                     jumpr = j;
+                   }
+
+                   continue;
+                 }
+               }
+             }
+             if(matchpointl > 5 && matchpointr > 5)
+             {
+               setpoint1 = setpoint2 = 0;
+               delayms(10000);
+             }
+          }
+          
+          
+          */
+

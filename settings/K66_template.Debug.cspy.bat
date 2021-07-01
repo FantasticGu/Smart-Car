@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "C:\Users\16078\Desktop\Smart-Car\settings\K66_template.Debug.general.xcl" --backend -f "C:\Users\16078\Desktop\Smart-Car\settings\K66_template.Debug.driver.xcl" 
+"D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "C:\Users\16078\Desktop\projects\Smart-Car\settings\K66_template.Debug.general.xcl" --backend -f "C:\Users\16078\Desktop\projects\Smart-Car\settings\K66_template.Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "C:\Users\16078\Desktop\Smart-Car\settings\K66_template.Debug.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\16078\Desktop\Smart-Car\settings\K66_template.Debug.driver.xcl" 
+"D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "C:\Users\16078\Desktop\projects\Smart-Car\settings\K66_template.Debug.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\16078\Desktop\projects\Smart-Car\settings\K66_template.Debug.driver.xcl" 
 
 @echo off 
 :end

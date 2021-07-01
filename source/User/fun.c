@@ -4,13 +4,25 @@
 ///////////////////////////////////////////////摄像头///////////////////////////////////////////////////////////
 ////////////////////////////////全局变量定义////////////////////////////////////
 #define test_port UART_0
+#define alpha 0.875
 unsigned int row=0;	//摄像头行计数，最大240
 uint16 Bline_left[H];	 //左边线存放数组
 uint16 Bline_right[H];	 //右边线存放数组
 uint16 Pick_table[H];	 //中心线存放数组
 uint8 Cmp=180;	//黑线阈值
-uint8 lastCmp=180;
 
+uint8 GetAvg(uint8 data[120][188],int row,int col)
+{
+ uint32 sum = 0;
+ for(int i = 0;i<row;i++)
+ {
+  for(int j = 0;j < col;j++)
+  {
+    sum += data[i][j];
+  }
+ }
+  return sum/(row * col);
+}
 
 
 /*******************************************************************************
@@ -22,16 +34,8 @@ int lastmiddleplace= 94;
 
 void find_edge()
 {
-  uint8 tmp = GetOSTU(Image_Data);
-  if(tmp > lastCmp)
-  {
-    lastCmp++;
-  }
-  else if(tmp < lastCmp)
-  {
-    lastCmp--;
-  }
-  Cmp = lastCmp;
+  uint8 tmp = GetAvg(Image_Data,120,188);//GetOSTU(Image_Data);
+  Cmp = (int)(Cmp*0.875+tmp*(1-0.875));
 
    for(int line=0;line<H;line++)
     {
