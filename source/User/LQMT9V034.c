@@ -150,6 +150,14 @@ int judgeLeft(int begin,int end,int val)
 }
 
 int speedflag = 0;
+float left_slope_queue[5]={0};
+float right_slope_queue[5]={0};
+static unsigned int queue_cnt = 0;
+
+void queue_in(float* queue,float data)
+{
+  queue[(queue_cnt++)%5] = data;
+}
 
 void imagineProcess(void)
 {
@@ -162,8 +170,19 @@ void imagineProcess(void)
           exti_disable(PTD15); //³¡ÖÐ¶Ï¹Ø±Õ 
           
           
-          SendPicture();
+          //SendPicture();
           find_edge();//
+          queue_in(left_slope_queue,regression(H-41,H-21,Bline_left));
+          queue_in(right_slope_queue,regression(H-41,H-21,Bline_right));
+          float left_slope = 0;
+          float right_slope = 0;
+          for(int i = 0;i<5;i++)
+          {
+            left_slope += left_slope_queue[i];
+            right_slope += right_slope_queue[i];
+          }
+          left_slope /= 5;
+          right_slope /= 5;
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
           
