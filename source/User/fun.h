@@ -12,5 +12,6 @@
 //IO³õÊ¼»¯º¯Êı
 
 void find_edge();//find_edge
+float regression(int startline,int endline,uint16* data);
 
 #endif 

@@ -183,6 +183,7 @@ void imagineProcess(void)
           }
           left_slope /= 5;
           right_slope /= 5;
+          static int start_cnt = 0;
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
           
@@ -191,8 +192,9 @@ void imagineProcess(void)
           {
             uart_printf(UART_0,"%d %d %d \n",Bline_left[i],Pick_table[i],Bline_right[i]);
             delayms(50);
-          }
-         uart_printf(UART_0,"\n\n");*/
+          }*/
+uart_printf(UART_0,"%f %f \n",left_slope,right_slope);
+         uart_printf(UART_0,"\n\n");
           
           if(judgeRight(31,41,180) == 1 && judgeRight(16,26,170) == 0)
           {
@@ -491,31 +493,32 @@ void imagineProcess(void)
             
           static int cnt_cross = 0;
           static int cstatus = 0;
+          
        
           static int cnt_angle = 0;
           static int angle_status = 0;
-          if(cnt_angle >= 10)
+          /*if(cnt_angle >= 10)
           {
             cnt_angle++;
             if(cnt_angle > 100)
             {
               cnt_angle = 0;
             }
-          }
-          if(judgeLeft(25,35,10)==0 && judgeRight(25,35,180)==1
-             && !lstatus && !rstatus && cnt_angle < 10)
+          }*/
+          if(left_slope > 0 && right_slope < 0
+             && !lstatus && !rstatus && angle_status < 2 && start_cnt > 50)
           {
             angle_status = 1;
-            cnt_angle++;
+            //cnt_angle++;
              int jumpl=94,jumpr=94;
              int matchpointl = 0,matchpointr = 0;
-             for(int i = H-61;i>H-71;i--)
+             for(int i = H-61;i>H-81;i--)
              {
                for(int j = 30;j<V/2-1;j++)
                {
                  if(Image_Data[i][j-2] > Cmp &&Image_Data[i][j-1] > Cmp 
                     && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp 
-                    && j < jumpl)
+                    && j - jumpl< -2)
                  {
                    matchpointl++;
                    if(jumpl-j<20)
@@ -529,7 +532,7 @@ void imagineProcess(void)
                {
                  if(Image_Data[i][j-2] < Cmp &&Image_Data[i][j-1] < Cmp 
                     && Image_Data[i][j]>Cmp && Image_Data[i][j+1]>Cmp
-                    && j>=jumpr )
+                    && j-jumpr>2 )
                  {
                    matchpointr++;
                    if(j - jumpr < 20)
@@ -541,10 +544,51 @@ void imagineProcess(void)
                  }
                }
              }
-             if(matchpointl > 5 && matchpointr > 5)
+             if(matchpointl >= 5 && matchpointr >= 5)
              {
                setpoint1 = setpoint2 = 0;
-               delayms(10000);
+               delayms(1000);
+               setpoint1 = setpoint2 = NORMAL_SPEED;
+               angle_status = 2;
+               cnt_angle = 0;
+             }
+          }
+          
+          if(angle_status == 2)
+          {
+             static int angle_in_cnt = 0;
+             for(int i = H-21;i>H-41;i--)
+              {
+                 Pick_table[i] = Bline_left[i]+60;
+              }
+             angle_in_cnt++;
+             if(angle_in_cnt > 50)
+             {
+               angle_status = 3;
+               angle_in_cnt = 0;
+             }
+          }
+          
+          if(angle_status == 3)
+          {
+            if(left_slope > 0 && right_slope < 0)
+            {
+              angle_status = 4;
+            }
+          }
+          
+          if(angle_status == 4)
+          {
+            static int angle_out_cnt = 0;
+             for(int i = H-21;i>H-41;i--)
+              {
+                 Pick_table[i] = Bline_left[i]+50;
+              }
+             angle_out_cnt++;
+             if(angle_out_cnt > 80)
+             {
+               angle_status = 0;
+               angle_out_cnt = 0;
              }
           }
           
@@ -605,7 +649,7 @@ void imagineProcess(void)
            }
            
            
-          static int start_cnt = 0;
+
           if(start_cnt <= 300)
           {
             start_cnt++;
