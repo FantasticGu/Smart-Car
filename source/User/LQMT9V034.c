@@ -154,6 +154,17 @@ float left_slope_queue[5]={0};
 float right_slope_queue[5]={0};
 static unsigned int queue_cnt = 0;
 
+#define START_STATUS 0
+#define CIRCLE_STATUS 1
+#define CROSS_STATUS 2
+#define THREE_ROAD_STATUS 3
+#define APRIL_TAG_STATUS 4
+#define STOP_STATUS 5
+
+int TOTAL_STATUS[] = {START_STATUS,THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CIRCLE_STATUS,
+                      THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS}
+int STATUS_NOW = 0;
+
 void queue_in(float* queue,float data)
 {
   queue[(queue_cnt++)%5] = data;
@@ -184,6 +195,8 @@ void imagineProcess(void)
           left_slope /= 5;
           right_slope /= 5;
           static int start_cnt = 0;
+          
+          int status = TOTAL_STATUS[STATUS_NOW];
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
           
@@ -193,427 +206,443 @@ void imagineProcess(void)
             uart_printf(UART_0,"%d %d %d \n",Bline_left[i],Pick_table[i],Bline_right[i]);
             delayms(50);
           }*/
-uart_printf(UART_0,"%f %f \n",left_slope,right_slope);
-         uart_printf(UART_0,"\n\n");
+         //uart_printf(UART_0,"%f %f \n",left_slope,right_slope);
+         //uart_printf(UART_0,"\n\n");
           
-          if(judgeRight(31,41,180) == 1 && judgeRight(16,26,170) == 0)
+          if(status == CIRCLE_STATUS)
           {
-            int p1 = 0;
-            int p2 = 0;
-            int p3 = 0;
-            for(int j = H-11;j>H-14;j--)
-            {
-              if (Bline_left[j]>15)
-              {
-                 p1 = Bline_left[j];
-                 break;
-              }
+             if(judgeRight(31,41,180) == 1 && judgeRight(16,26,170) == 0)
+             {
+               int p1 = 0;
+               int p2 = 0;
+               int p3 = 0;
+               for(int j = H-11;j>H-14;j--)
+               {
+                 if (Bline_left[j]>15)
+                 {
+                    p1 = Bline_left[j];
+                    break;
+                 }
+                 
+               } 
+               for(int j = H-19;j>H-22;j--)
+               {
+                 if (Bline_left[j]>20)
+                 {
+                    p2 = Bline_left[j];
+                    break;
+                 }
+                 
+               } 
+               for(int j = H-26;j>H-30;j--)
+               {
+                 if (Bline_left[j]>25)
+                 {
+                    p3 = Bline_left[j];
+                    break;
+                 }
+                 
+               }
+               if(p1 && p2 && p3 && abs(p2-p1)<10 && abs(p3-p2)<10 && abs(p3-p1)<20)
+               {
+                 int l = 0;
+                 for(int j = H-11;j>H-41;j--)
+                 {
+                   if(Bline_left[j]>25)
+                   {
+                     l++;
+                   }
+                 }
+                 if(l>20)
+                 {
+                    rstatus = 1;
+                 }
+               }            
+             }
+             if(rstatus == 1)
+             {
+               static int cnt_1 = 0;
+               cnt_1++;
+               for(int i = H-11;i>H-41;i--)
+               {
+                 Pick_table[i] = Bline_left[i]+60;
+               }
+               if(judgeRight(35,45,165) == 0)
+               {
+                 cnt_1 = 0;
+                 rstatus = 2;
+               }
+               if(cnt_1 > 25)
+               {
+                 cnt_1 = 0;
+                 rstatus = 0;
+               }
+               
+             }
+         
+             if(rstatus == 2)
+             {
+               static int cnt_2 = 0;
+               cnt_2++;
+               if(cnt_2 > 20)
+               {
+                 cnt_2 = 0;
+                 rstatus = 0;
+               }
+               if(judgeRight(25,35,180)==1)
+               {
+                 cnt_2 = 0;
+                 rstatus = 3;
+               }
+               
+             }
+             
+             if(rstatus==3)
+             {
+                static int cnt_3 = 0;
+                 cnt_3++;
+                  for(int i = H-11;i>H-41;i--)
+                 {
+                   Pick_table[i] = Bline_right[i]-40;
+                 }
+                 if(cnt_3 > 10)
+                 {
+                   cnt_3 = 0;
+                   rstatus = 4;
+                   
+                 }
+             }
+             
+             if(rstatus == 4)
+             {
+               static int cnt_4 = 0;
+                   cnt_4++;
+                   if(cnt_4>50)
+                   {
+                     if(judgeLeft(15,25,10) == 0)
+                     {
+                       cnt_4 = 0;
+                       rstatus = 5;
+                       
+                     }
+                   }
+               
+             }
+             
+             if(rstatus == 5)
+             {
+               static int cnt_6 = 0;
+               cnt_6++;
+               for(int i = H-11;i>H-41;i--)
+               {
+                 Pick_table[i] = Bline_right[i]-50;
+               }
+               if(cnt_6 > 20 && judgeLeft(25,35,15) == 1)
+               {
+                 cnt_6 = 0;
+                 rstatus = 7;
+               }
+               
+             }
+                       
+                 
+             if(rstatus == 7)
+             {
+               static int cnt_7 = 0;
+               cnt_7 ++;
+               for(int i = H-11;i>H-41;i--)
+               {
+                 Pick_table[i] = Bline_left[i]+50;
+               }
+               if(cnt_7 > 20)
+               {
+                 cnt_7 = 0;
+                 rstatus = 0;
+                 STATUS_NOW++;
+               }
+             }
+          
               
-            } 
-            for(int j = H-19;j>H-22;j--)
-            {
-              if (Bline_left[j]>20)
-              {
-                 p2 = Bline_left[j];
-                 break;
-              }
               
-            } 
-            for(int j = H-26;j>H-30;j--)
+            if(judgeLeft(31,41,8) == 0 && judgeLeft(16,26,18) == 1)
             {
-              if (Bline_left[j]>25)
+              int p1 = 0;
+              int p2 = 0;
+              int p3 = 0;
+              for(int j = H-11;j>H-14;j--)
               {
-                 p3 = Bline_left[j];
-                 break;
-              }
-              
-            }
-            if(p1 && p2 && p3 && abs(p2-p1)<10 && abs(p3-p2)<10 && abs(p3-p1)<20)
-            {
-              int l = 0;
-              for(int j = H-11;j>H-41;j--)
-              {
-                if(Bline_left[j]>25)
+                if (Bline_right[j]<173)
                 {
-                  l++;
+                   p1 = Bline_right[j];
+                   break;
                 }
-              }
-              if(l>20)
+                
+              } 
+              for(int j = H-19;j>H-22;j--)
               {
-                 rstatus = 1;
+                if (Bline_right[j]<168)
+                {
+                   p2 = Bline_right[j];
+                   break;
+                }
+                
+              } 
+              for(int j = H-26;j>H-30;j--)
+              {
+                if (Bline_right[j]<163)
+                {
+                   p3 = Bline_right[j];
+                   break;
+                }
+                
               }
-            }            
-          }
-          if(rstatus == 1)
-          {
-            static int cnt_1 = 0;
-            cnt_1++;
-            for(int i = H-11;i>H-41;i--)
-            {
-              Pick_table[i] = Bline_left[i]+60;
+              if(p1 && p2 && p3 && abs(p2-p1)<10 && abs(p3-p2)<10 && abs(p3-p1)<20)
+              {
+                int r = 0;
+                for(int j = H-11;j>H-41;j--)
+                {
+                  if(Bline_right[j]<163)
+                  {
+                    r++;
+                  }
+                }
+                if(r>20)
+                {
+                   lstatus = 1;
+                }
+              }            
             }
-            if(judgeRight(35,45,165) == 0)
+            if(lstatus == 1)
             {
-              cnt_1 = 0;
-              rstatus = 2;
+              static int cnt_1 = 0;
+              cnt_1++;
+              for(int i = H-11;i>H-41;i--)
+              {
+                Pick_table[i] = Bline_right[i]-60;
+              }
+              if(judgeLeft(35,45,23) == 1)
+              {
+                cnt_1 = 0;
+                lstatus = 2;
+              }
+                if(cnt_1 > 35)
+              {
+                cnt_1 = 0;
+                lstatus = 0;
+              }
+              
             }
-            if(cnt_1 > 25)
+            if(lstatus == 2)
+            {               
+              static int cnt_2 = 0;
+              cnt_2++;
+              if(cnt_2 > 25)
+              {
+                cnt_2 = 0;
+                lstatus = 0;
+              }
+              if(judgeLeft(25,35,10) == 0)
+              {
+                cnt_2 = 0;
+                lstatus = 3;
+              }
+              
+            }
+            if(lstatus==3)
             {
-              cnt_1 = 0;
-              rstatus = 0;
-            }
-            
-          }
-      
-          if(rstatus == 2)
-          {
-            static int cnt_2 = 0;
-            cnt_2++;
-            if(cnt_2 > 20)
-            {
-              cnt_2 = 0;
-              rstatus = 0;
-            }
-            if(judgeRight(25,35,180)==1)
-            {
-              cnt_2 = 0;
-              rstatus = 3;
-            }
-            
-          }
-          
-          if(rstatus==3)
-          {
-             static int cnt_3 = 0;
+              static int cnt_3 = 0;
               cnt_3++;
                for(int i = H-11;i>H-41;i--)
               {
-                Pick_table[i] = Bline_right[i]-40;
+                Pick_table[i] = Bline_left[i]+40;
               }
               if(cnt_3 > 10)
               {
-                cnt_3 = 0;
-                rstatus = 4;
-                
+                  cnt_3 = 0;
+                  lstatus = 4;
               }
-          }
-          
-          if(rstatus == 4)
-          {
-            static int cnt_4 = 0;
-                cnt_4++;
-                if(cnt_4>50)
-                {
-                  if(judgeLeft(15,25,10) == 0)
-                  {
-                    cnt_4 = 0;
-                    rstatus = 5;
-                    
-                  }
-                }
-            
-          }
-          
-          if(rstatus == 5)
-          {
-            static int cnt_6 = 0;
-            cnt_6++;
-            for(int i = H-11;i>H-41;i--)
-            {
-              Pick_table[i] = Bline_right[i]-50;
-            }
-            if(cnt_6 > 20 && judgeLeft(25,35,15) == 1)
-            {
-              cnt_6 = 0;
-              rstatus = 7;
             }
             
-          }
-                    
-              
-          if(rstatus == 7)
-          {
-            static int cnt_7 = 0;
-            cnt_7 ++;
-            for(int i = H-11;i>H-41;i--)
+            if(lstatus==4)
             {
-              Pick_table[i] = Bline_left[i]+50;
-            }
-            if(cnt_7 > 20)
-            {
-              cnt_7 = 0;
-              rstatus = 0;
-            }
-          }
-              
-              
-              if(judgeLeft(31,41,8) == 0 && judgeLeft(16,26,18) == 1)
+              static int cnt_4 = 0;
+              cnt_4++;
+              if(cnt_4>50)
               {
-                int p1 = 0;
-                int p2 = 0;
-                int p3 = 0;
-                for(int j = H-11;j>H-14;j--)
-                {
-                  if (Bline_right[j]<173)
-                  {
-                     p1 = Bline_right[j];
-                     break;
-                  }
-                  
-                } 
-                for(int j = H-19;j>H-22;j--)
-                {
-                  if (Bline_right[j]<168)
-                  {
-                     p2 = Bline_right[j];
-                     break;
-                  }
-                  
-                } 
-                for(int j = H-26;j>H-30;j--)
-                {
-                  if (Bline_right[j]<163)
-                  {
-                     p3 = Bline_right[j];
-                     break;
-                  }
-                  
-                }
-                if(p1 && p2 && p3 && abs(p2-p1)<10 && abs(p3-p2)<10 && abs(p3-p1)<20)
-                {
-                  int r = 0;
-                  for(int j = H-11;j>H-41;j--)
-                  {
-                    if(Bline_right[j]<163)
-                    {
-                      r++;
-                    }
-                  }
-                  if(r>20)
-                  {
-                     lstatus = 1;
-                  }
-                }            
-              }
-              if(lstatus == 1)
-              {
-                static int cnt_1 = 0;
-                cnt_1++;
-                for(int i = H-11;i>H-41;i--)
-                {
-                  Pick_table[i] = Bline_right[i]-60;
-                }
-                if(judgeLeft(35,45,23) == 1)
-                {
-                  cnt_1 = 0;
-                  lstatus = 2;
-                }
-                  if(cnt_1 > 35)
-                {
-                  cnt_1 = 0;
-                  lstatus = 0;
-                }
-                
-              }
-              if(lstatus == 2)
-              {               
-                static int cnt_2 = 0;
-                cnt_2++;
-                if(cnt_2 > 25)
-                {
-                  cnt_2 = 0;
-                  lstatus = 0;
-                }
-                if(judgeLeft(25,35,10) == 0)
-                {
-                  cnt_2 = 0;
-                  lstatus = 3;
-                }
-                
-              }
-              if(lstatus==3)
-              {
-                static int cnt_3 = 0;
-                cnt_3++;
-                 for(int i = H-11;i>H-41;i--)
-                {
-                  Pick_table[i] = Bline_left[i]+40;
-                }
-                if(cnt_3 > 10)
-                {
-                    cnt_3 = 0;
-                    lstatus = 4;
-                }
-              }
-              
-              if(lstatus==4)
-              {
-                static int cnt_4 = 0;
-                cnt_4++;
-                if(cnt_4>50)
-                {
 
-                  if(judgeRight(15,25,170) == 1)
-                  {
-                    cnt_4 = 0;
-                    lstatus = 5;
-                  }   
-                }
+                if(judgeRight(15,25,170) == 1)
+                {
+                  cnt_4 = 0;
+                  lstatus = 5;
+                }   
               }
-              if(lstatus == 5)
+            }
+            if(lstatus == 5)
+            {
+              static int cnt_5 = 0;
+              cnt_5++;
+              for(int i = H-11;i>H-41;i--)
               {
-                static int cnt_5 = 0;
-                cnt_5++;
-                for(int i = H-11;i>H-41;i--)
-                {
-                  Pick_table[i] = Bline_left[i]+50;
-                }
-                if(cnt_5>20 && judgeRight(25,35,170)==0)
-                {
-                  cnt_5 = 0;
-                  lstatus = 7;
-                }
+                Pick_table[i] = Bline_left[i]+50;
               }
-                
+              if(cnt_5>20 && judgeRight(25,35,170)==0)
+              {
+                cnt_5 = 0;
+                lstatus = 7;
+              }
+            }
               
-              if(lstatus == 7)
+            
+            if(lstatus == 7)
+            {
+              static int cnt_7 = 0;
+              cnt_7 += 1;
+              for(int i = H-11;i>H-41;i--)
               {
-                static int cnt_7 = 0;
-                cnt_7 += 1;
-                for(int i = H-11;i>H-41;i--)
-                {
-                  Pick_table[i] = Bline_right[i]-50;
-                }
-                if(cnt_7 > 20)
-                {
-                  cnt_7 = 0;
-                  lstatus = 0;
-                }
+                Pick_table[i] = Bline_right[i]-50;
               }
+              if(cnt_7 > 20)
+              {
+                cnt_7 = 0;
+                lstatus = 0;
+                STATUS_NOW++;
+              }
+            }
+          }
             
           static int cnt_cross = 0;
-          static int cstatus = 0;
-          
-       
+          static int cstatus = 0;       
           static int cnt_angle = 0;
           static int angle_status = 0;
-          /*if(cnt_angle >= 10)
+          
+          if(status == THREE_ROAD_STATUS)
           {
-            cnt_angle++;
-            if(cnt_angle > 100)
+            if(left_slope > 0.2 && right_slope < -0.2
+            && angle_status < 2)
             {
-              cnt_angle = 0;
-            }
-          }*/
-          if(left_slope > 0 && right_slope < 0
-             && !lstatus && !rstatus && angle_status < 2 && start_cnt > 50)
-          {
-            angle_status = 1;
-            //cnt_angle++;
-             int jumpl=94,jumpr=94;
-             int matchpointl = 0,matchpointr = 0;
-             for(int i = H-61;i>H-81;i--)
-             {
-               for(int j = 30;j<V/2-1;j++)
+               angle_status = 1;
+               int jumpl=94,jumpr=94;
+               int matchpointl = 0,matchpointr = 0;
+               for(int i = H-61;i>H-81;i--)
                {
-                 if(Image_Data[i][j-2] > Cmp &&Image_Data[i][j-1] > Cmp 
-                    && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp 
-                    && j - jumpl< -2)
+                 for(int j = 30;j<V/2-1;j++)
                  {
-                   matchpointl++;
-                   if(jumpl-j<20)
+                   if(Image_Data[i][j-2] > Cmp &&Image_Data[i][j-1] > Cmp 
+                      && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp 
+                      && j - jumpl< -2)
                    {
-                   jumpl = j;
+                     matchpointl++;
+                     if(jumpl-j<20)
+                     {
+                     jumpl = j;
+                     }
+                     continue;
                    }
-                   continue;
                  }
-               }
-               for(int j = V-30;j>V/2+1;j--)
-               {
-                 if(Image_Data[i][j-2] < Cmp &&Image_Data[i][j-1] < Cmp 
-                    && Image_Data[i][j]>Cmp && Image_Data[i][j+1]>Cmp
-                    && j-jumpr>2 )
+                 for(int j = V-30;j>V/2+1;j--)
                  {
-                   matchpointr++;
-                   if(j - jumpr < 20)
+                   if(Image_Data[i][j-2] < Cmp &&Image_Data[i][j-1] < Cmp 
+                      && Image_Data[i][j]>Cmp && Image_Data[i][j+1]>Cmp
+                      && j-jumpr>2 )
                    {
-                     jumpr = j;
-                   }
+                     matchpointr++;
+                     if(j - jumpr < 20)
+                     {
+                       jumpr = j;
+                     }
 
-                   continue;
+                     continue;
+                   }
                  }
                }
-             }
-             if(matchpointl >= 5 && matchpointr >= 5)
-             {
-               setpoint1 = setpoint2 = 0;
-               delayms(1000);
-               setpoint1 = setpoint2 = NORMAL_SPEED;
-               angle_status = 2;
-               cnt_angle = 0;
-             }
-          }
-          
-          if(angle_status == 2)
-          {
-             static int angle_in_cnt = 0;
-             for(int i = H-21;i>H-41;i--)
-              {
-                 Pick_table[i] = Bline_left[i]+60;
-              }
-             angle_in_cnt++;
-             if(angle_in_cnt > 50)
-             {
-               angle_status = 3;
-               angle_in_cnt = 0;
-             }
-          }
-          
-          if(angle_status == 3)
-          {
-            if(left_slope > 0 && right_slope < 0)
+               if(matchpointl >= 5 && matchpointr >= 5)
+               {
+                 setpoint1 = setpoint2 = 0;
+                 delayms(1000);
+                 setpoint1 = setpoint2 = NORMAL_SPEED;
+                 angle_status = 2;
+                 cnt_angle = 0;
+               }
+            }
+            
+            if(angle_status == 2)
             {
-              angle_status = 4;
+               static int angle_in_cnt = 0;
+               for(int i = H-21;i>H-41;i--)
+                {
+                   Pick_table[i] = Bline_left[i]+50;
+                }
+               angle_in_cnt++;
+               if(angle_in_cnt > 50)
+               {
+                 angle_status = 3;
+                 angle_in_cnt = 0;
+               }
+            }
+            
+            if(angle_status == 3)
+            {
+              if(left_slope > 0.3 && right_slope < -0.3)
+              {
+                angle_status = 4;
+              }
+            }
+            
+            if(angle_status == 4)
+            {
+              static int angle_out_cnt = 0;
+               for(int i = H-21;i>H-41;i--)
+                {
+                   Pick_table[i] = Bline_left[i]+50;
+                }
+               angle_out_cnt++;
+               if(angle_out_cnt > 80)
+               {
+                 angle_status = 0;
+                 angle_out_cnt = 0;
+               }
             }
           }
           
-          if(angle_status == 4)
+          
+          
+          if(status == CROSS_STATUS)
           {
-            static int angle_out_cnt = 0;
-             for(int i = H-21;i>H-41;i--)
-              {
-                 Pick_table[i] = Bline_left[i]+50;
-              }
-             angle_out_cnt++;
-             if(angle_out_cnt > 80)
+             if(judgeLeft(15,35,10)==0 && judgeRight(15,35,180)==1 && !cstatus)
              {
-               angle_status = 0;
-               angle_out_cnt = 0;
+               cstatus = 1;
+               lstatus = rstatus = 0;
+               
+             }
+             if(cstatus == 1)
+             {
+               static int cnt_c1 = 0;
+               cnt_c1++;
+               if(cnt_c1 > 50)
+               {
+                 cnt_c1 = 0;
+                 cstatus = 2;
+               }
+             }
+             if(judgeLeft(15,35,10)==0 && judgeRight(15,35,180)==1 && cstatus == 2)
+             {
+               cstatus = 3;
+               lstatus = rstatus = 0;
+             }
+             if(cstatus == 3)
+             {
+               static int cnt_c3 = 0;
+               cnt_c3++;
+               PWMSetSteer(990);
+               if(cnt_c3 > 50)
+               {
+                 cnt_c3 = 0;
+                 cstatus = 0;
+                 STATUS_NOW++;
+               }
              }
           }
-          
-          
-          
-           if(cnt_cross < 200)
-           {
-             cnt_cross++;
-           }
-           if(cnt_cross > 100 && judgeLeft(15,35,5)==0 && judgeRight(15,35,183)==1 && lstatus<2 && rstatus<2)
-           {
-             cstatus = 1;
-             lstatus = rstatus = 0;
-             
-           }
-           if(cstatus)
-           {
-             static int cnt_c = 0;
-             cnt_c++;
-             if(cnt_c > 20)
-             {
-               cnt_c = 0;
-               cstatus = 0;
-             }
-           }
+           
            
            
            
@@ -649,23 +678,27 @@ uart_printf(UART_0,"%f %f \n",left_slope,right_slope);
            }
            
            
-
-          if(start_cnt <= 300)
+          if(status == START_STATUS)
           {
-            start_cnt++;
-            if(start_cnt < 50)
+            if(start_cnt <= 50)
             {
+              start_cnt++;
               for(int i = H-21;i>H-41;i--)
               {
                  Pick_table[i] = Bline_left[i]+50;
               }
             }
+            else
+            {
+              STATUS_NOW++;
+            }
           }
+          
            
           static int havestop = 0;
           static int stopflag = 0;
           int jumppoint = 0;
-          if(!havestop && start_cnt > 200)
+          if(!havestop)
           {
             for(int i = H-41;i>H-61;i--)
             {
@@ -679,9 +712,9 @@ uart_printf(UART_0,"%f %f \n",left_slope,right_slope);
               }
               if(jumppoint > 8)
               {
-                if(!stopflag)
+                if(status != STOP_STATUS)
                 {
-                  stopflag = 3;
+                  stopflag = 1;
                   break;
                 }
                 else
@@ -706,7 +739,7 @@ uart_printf(UART_0,"%f %f \n",left_slope,right_slope);
                 Pick_table[i] = Bline_right[i]-50;
              }
              stop_cnt++;
-             if(stop_cnt>30)
+             if(stop_cnt>50)
              {
                stop_cnt = 0;
                stopflag = 2;
