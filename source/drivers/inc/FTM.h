@@ -17,7 +17,7 @@
 #define FTM0_CH0_PIN    PTC1        //PTC1、PTA3            PTA3不要用（与JLINK冲突）
 #define FTM0_CH1_PIN    PTC2        //PTC2、PTA4
 #define FTM0_CH2_PIN    PTC3        //PTC3、PTA5
-#define FTM0_CH3_PIN   PTC4        //PTC4、PTA6
+#define FTM0_CH3_PIN    PTC4        //PTC4、PTA6
 #define FTM0_CH4_PIN    PTD4        //PTD4、PTA7
 #define FTM0_CH5_PIN    PTD5        //PTD5、PTA0            PTA0不要用（与JLINK冲突）
 #define FTM0_CH6_PIN    PTD6        //PTD6、PTA1            PTA1不要用（与JLINK冲突）

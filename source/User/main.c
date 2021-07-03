@@ -23,7 +23,7 @@ void main()
   //todo: change tha algo in 大津法 to 计算新的阈值
   
   DisableInterrupts;
-  pit_init(PIT0, 10);
+  pit_init(PIT0, 100);
   uart_init(test_port, 256000); 
   LQMT9V034_Init();                         
   ftm_quad_init(FTM1);

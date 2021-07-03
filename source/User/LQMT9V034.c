@@ -161,9 +161,11 @@ static unsigned int queue_cnt = 0;
 #define APRIL_TAG_STATUS 4
 #define STOP_STATUS 5
 
-int TOTAL_STATUS[] = {START_STATUS,THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CIRCLE_STATUS,
-                      THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS}
+int TOTAL_STATUS[] = {START_STATUS,THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,
+                      THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};
 int STATUS_NOW = 0;
+
+int LAP_NUM = 0;
 
 void queue_in(float* queue,float data)
 {
@@ -371,7 +373,7 @@ void imagineProcess(void)
               int p3 = 0;
               for(int j = H-11;j>H-14;j--)
               {
-                if (Bline_right[j]<173)
+                if (Bline_right[j]<183)
                 {
                    p1 = Bline_right[j];
                    break;
@@ -380,7 +382,7 @@ void imagineProcess(void)
               } 
               for(int j = H-19;j>H-22;j--)
               {
-                if (Bline_right[j]<168)
+                if (Bline_right[j]<178)
                 {
                    p2 = Bline_right[j];
                    break;
@@ -389,7 +391,7 @@ void imagineProcess(void)
               } 
               for(int j = H-26;j>H-30;j--)
               {
-                if (Bline_right[j]<163)
+                if (Bline_right[j]<173)
                 {
                    p3 = Bline_right[j];
                    break;
@@ -401,7 +403,7 @@ void imagineProcess(void)
                 int r = 0;
                 for(int j = H-11;j>H-41;j--)
                 {
-                  if(Bline_right[j]<163)
+                  if(Bline_right[j]<173)
                   {
                     r++;
                   }
@@ -517,7 +519,7 @@ void imagineProcess(void)
           
           if(status == THREE_ROAD_STATUS)
           {
-            if(left_slope > 0.2 && right_slope < -0.2
+            if(left_slope > 0 && right_slope < 0
             && angle_status < 2)
             {
                angle_status = 1;
@@ -529,7 +531,7 @@ void imagineProcess(void)
                  {
                    if(Image_Data[i][j-2] > Cmp &&Image_Data[i][j-1] > Cmp 
                       && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp 
-                      && j - jumpl< -2)
+                      && j - jumpl< -1)
                    {
                      matchpointl++;
                      if(jumpl-j<20)
@@ -543,7 +545,7 @@ void imagineProcess(void)
                  {
                    if(Image_Data[i][j-2] < Cmp &&Image_Data[i][j-1] < Cmp 
                       && Image_Data[i][j]>Cmp && Image_Data[i][j+1]>Cmp
-                      && j-jumpr>2 )
+                      && j-jumpr>1 )
                    {
                      matchpointr++;
                      if(j - jumpr < 20)
@@ -557,10 +559,22 @@ void imagineProcess(void)
                }
                if(matchpointl >= 5 && matchpointr >= 5)
                {
+                 if(LAP_NUM == 0)
+                 {
+                 /*setpoint1 = setpoint2 = -120;
+                 delayms(200);
                  setpoint1 = setpoint2 = 0;
                  delayms(1000);
+                 */
+                 setpoint1 = setpoint2 = -20;
+                 delayms(1000);
                  setpoint1 = setpoint2 = NORMAL_SPEED;
-                 angle_status = 2;
+                   angle_status = 2; 
+                 }
+                 else
+                 {
+                   angle_status = 5;
+                 }
                  cnt_angle = 0;
                }
             }
@@ -570,10 +584,10 @@ void imagineProcess(void)
                static int angle_in_cnt = 0;
                for(int i = H-21;i>H-41;i--)
                 {
-                   Pick_table[i] = Bline_left[i]+50;
+                   Pick_table[i] = 50;
                 }
                angle_in_cnt++;
-               if(angle_in_cnt > 50)
+               if(angle_in_cnt > 10)
                {
                  angle_status = 3;
                  angle_in_cnt = 0;
@@ -582,7 +596,7 @@ void imagineProcess(void)
             
             if(angle_status == 3)
             {
-              if(left_slope > 0.3 && right_slope < -0.3)
+              if(left_slope > 0.2 && right_slope < -0.2)
               {
                 angle_status = 4;
               }
@@ -596,12 +610,53 @@ void imagineProcess(void)
                    Pick_table[i] = Bline_left[i]+50;
                 }
                angle_out_cnt++;
-               if(angle_out_cnt > 80)
+               if(angle_out_cnt > 20)
                {
                  angle_status = 0;
                  angle_out_cnt = 0;
+                 STATUS_NOW++;
                }
             }
+            
+            if(angle_status == 5)
+            {
+               static int angle_in_cnt = 0;
+               for(int i = H-21;i>H-41;i--)
+                {
+                   Pick_table[i] = 130;
+                }
+               angle_in_cnt++;
+               if(angle_in_cnt > 10)
+               {
+                 angle_status = 6;
+                 angle_in_cnt = 0;
+               }
+            }
+            
+            if(angle_status == 6)
+            {
+              if(left_slope > 0.2 && right_slope < -0.2)
+              {
+                angle_status = 7;
+              }
+            }
+            
+            if(angle_status == 7)
+            {
+              static int angle_out_cnt = 0;
+               for(int i = H-21;i>H-41;i--)
+                {
+                   Pick_table[i] = Bline_right[i]-55;
+                }
+               angle_out_cnt++;
+               if(angle_out_cnt > 20)
+               {
+                 angle_status = 0;
+                 angle_out_cnt = 0;
+                 STATUS_NOW++;
+               }
+            }
+            
           }
           
           
@@ -618,25 +673,9 @@ void imagineProcess(void)
              {
                static int cnt_c1 = 0;
                cnt_c1++;
-               if(cnt_c1 > 50)
+               if(cnt_c1 > 30)
                {
                  cnt_c1 = 0;
-                 cstatus = 2;
-               }
-             }
-             if(judgeLeft(15,35,10)==0 && judgeRight(15,35,180)==1 && cstatus == 2)
-             {
-               cstatus = 3;
-               lstatus = rstatus = 0;
-             }
-             if(cstatus == 3)
-             {
-               static int cnt_c3 = 0;
-               cnt_c3++;
-               PWMSetSteer(990);
-               if(cnt_c3 > 50)
-               {
-                 cnt_c3 = 0;
                  cstatus = 0;
                  STATUS_NOW++;
                }
@@ -715,6 +754,7 @@ void imagineProcess(void)
                 if(status != STOP_STATUS)
                 {
                   stopflag = 1;
+                  LAP_NUM = 1;
                   break;
                 }
                 else

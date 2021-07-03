@@ -14,14 +14,14 @@ extern uint16 bigbendflag;
 float in1,out1,in2,out2,lastin1,lastin2=0;
 float setpoint1=NORMAL_SPEED;
 float setpoint2=NORMAL_SPEED;
-float p1=10.0;
-float p2=10.0;
+float p1=120.0;
+float p2=120.0;
 float i1=0.0;
 float i2=0.0;
-float d1=0.1;
-float d2=0.1;
+float d1=1;
+float d2=1;
 float max_speed=7000;
-float min_speed=-3000;
+float min_speed=-7000;
 float iterm1=0;
 float iterm2=0;
 
@@ -184,7 +184,7 @@ void ele_direction_control()
             }*/
         }else
         {
-          dir_control_P=20;
+          dir_control_P=15;
           dir_P_value=dir_control_P*dir_error;
           
         }
