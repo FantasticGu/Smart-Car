@@ -20,8 +20,8 @@ float i1=0.0;
 float i2=0.0;
 float d1=1;
 float d2=1;
-float max_speed=7000;
-float min_speed=-7000;
+float max_speed=8000;
+float min_speed=-8000;
 float iterm1=0;
 float iterm2=0;
 
@@ -116,93 +116,167 @@ void ele_direction_control()
         //uart_printf(UART_0,"dir_error =  %d\n",dir_error);
 
                        
-        if(-15>dir_error>-35)
+        if(-30>dir_error)
         {
-            dir_control_P=12;
+            dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
             /*if(speedflag == 1)
             {
-                setpoint1 = NORMAL_SPEED+10*dir_error;
+                setpoint1 = NORMAL_SPEED+1.5*dir_error;
                 setpoint2 = NORMAL_SPEED;
+            }
+            else if(speedflag == 2)
+            {
+                setpoint1 = NORMAL_SPEED+dir_error;
+                setpoint2 = NORMAL_SPEED;
+            }
+            else if(speedflag == 5)
+            {
+              setpoint2 = STOP_SPEED;
+                setpoint1 = STOP_SPEED+1*dir_error;
             }*/
         }
-        if(-8>=dir_error>=-15)
+        else if(-15>=dir_error && dir_error>=-30)
         {
-            dir_control_P=10;
+            dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
             /*if(speedflag == 1)
             {
-              setpoint1 = NORMAL_SPEED+8*dir_error;
+              setpoint1 = NORMAL_SPEED+1*dir_error;
+              setpoint2 = NORMAL_SPEED;
+            }
+            else if(speedflag == 2)
+            {
+                setpoint1 = NORMAL_SPEED+dir_error;
                 setpoint2 = NORMAL_SPEED;
+            }
+            else if(speedflag == 5)
+            {
+              setpoint2 = STOP_SPEED;
+                setpoint1 = STOP_SPEED+1*dir_error;
             }*/
         }
-        if(-2>dir_error>-8)
+        else if(-5>dir_error && dir_error>-15)
         {
-            dir_control_P=4;
+            dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
             /*if(speedflag == 1)
             {
-              setpoint1 = NORMAL_SPEED+6*dir_error;
+              setpoint1 = NORMAL_SPEED+0.5*dir_error;
+              setpoint2 = NORMAL_SPEED;
+            }
+            else if(speedflag == 2)
+            {
+                setpoint1 = NORMAL_SPEED+dir_error;
                 setpoint2 = NORMAL_SPEED;
+            }
+            else if(speedflag == 5)
+            {
+              setpoint2 = STOP_SPEED;
+                setpoint1 = STOP_SPEED+1*dir_error;
             }*/
         } 
-        else if(-2<=dir_error&&dir_error<=2)
+        else if(-5<=dir_error && dir_error<=0)
         {
-            dir_control_P=0;
+            dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
-           /*if(speedflag == 1)
+           if(speedflag == 1)
             {
               setpoint1 = setpoint2 = NORMAL_SPEED;
-            }*/
-        }else if(2<dir_error<8)
+            }
+              else if(speedflag == 2)
+            {
+              setpoint1 = setpoint2 = CIRCLE_SPEED;
+            }
+           
+        }
+        else if(0<=dir_error && dir_error<=5)
         {
-            dir_control_P=4;
+            dir_control_P=5;
+            dir_P_value=dir_control_P*dir_error;
+           if(speedflag == 1)
+            {
+              setpoint1 = setpoint2 = NORMAL_SPEED;
+            }
+           else if(speedflag == 2)
+            {
+              setpoint1 = setpoint2 = CIRCLE_SPEED;
+            }
+           
+        }
+        else if(5<dir_error && dir_error<15)
+        {
+            dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
            /*if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-6*dir_error;
+              setpoint2 = NORMAL_SPEED-0.5*dir_error;
                 setpoint1 = NORMAL_SPEED;
+            }
+           else if(speedflag == 2)
+            {
+              setpoint2 = NORMAL_SPEED-dir_error;
+                setpoint1 = NORMAL_SPEED;
+            }
+           else if(speedflag == 5)
+            {
+              setpoint2 = STOP_SPEED-1*dir_error;
+                setpoint1 = STOP_SPEED;
             }*/
-        }else if(15<=dir_error<=35)
+        }
+        else if(15<dir_error && dir_error<30)
         {
-            dir_control_P=12;
+            dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
             /*if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-8*dir_error;
+              setpoint2 = NORMAL_SPEED-1*dir_error;
               setpoint1 = NORMAL_SPEED;
+            }
+            else if(speedflag == 2)
+            {
+              setpoint2 = NORMAL_SPEED-dir_error;
+                setpoint1 = NORMAL_SPEED;
+            }
+            else if(speedflag == 5)
+            {
+              setpoint2 = STOP_SPEED-1*dir_error;
+                setpoint1 = STOP_SPEED;
             }*/
-        }
-        else if(8<dir_error<15)
+        }else if(30<=dir_error)
         {
-            dir_control_P=10;
+            dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
             /*if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-10*dir_error;
+              setpoint2 = NORMAL_SPEED-1.5*dir_error;
               setpoint1 = NORMAL_SPEED;
+            }
+            else if(speedflag == 2)
+            {
+              setpoint2 = NORMAL_SPEED-dir_error;
+                setpoint1 = NORMAL_SPEED;
+            }else if(speedflag == 5)
+            {
+              setpoint2 = STOP_SPEED-1*dir_error;
+                setpoint1 = STOP_SPEED;
             }*/
-        }else
-        {
-          dir_control_P=15;
-          dir_P_value=dir_control_P*dir_error;
-          
         }
         
         
-        if(dir_P_value<-150)dir_P_value=-150;
-        if(dir_P_value>150)dir_P_value=150;
+        if(dir_P_value<-200)dir_P_value=-200;
+        if(dir_P_value>200)dir_P_value=200;
         
         //uart_printf(UART_0,"output = %f\n",dir_P_value);
         
-        dir_control_D=0.1;
+        dir_control_D=0.125;
         dir_D_value=dir_control_D*(dir_error-last_dir_error);
         
         g_fDirectionControlOut=dir_P_value+dir_D_value; 
         last_dir_error=dir_error;
 
         
-        ftm_pwm_duty(FTM3, FTM_CH1,(int)(990-g_fDirectionControlOut));
+        ftm_pwm_duty(FTM3, FTM_CH1,(int)(1250-g_fDirectionControlOut));
 }
 
 

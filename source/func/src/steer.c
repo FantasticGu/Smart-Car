@@ -103,9 +103,7 @@ void steerCtrl1()
     angle_pwm = 0;    //去除warning
     
     //自己的舵机控制算法
-    
-    
-    
+
     PWMSetSteer1(angle_pwm) ;  
     */
 }

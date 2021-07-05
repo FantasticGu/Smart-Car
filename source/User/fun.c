@@ -5,6 +5,11 @@
 ////////////////////////////////全局变量定义////////////////////////////////////
 #define test_port UART_0
 #define alpha 0.875
+
+#define MY_STEER_LEFT 3050
+#define MY_STEER_MIDDLE 1800
+#define MY_STEER_RIGHT 550
+
 unsigned int row=0;	//摄像头行计数，最大240
 uint16 Bline_left[H];	 //左边线存放数组
 uint16 Bline_right[H];	 //右边线存放数组
@@ -148,4 +153,22 @@ float regression(int startline,int endline,uint16* data)
     B=(SumUp/SumDown);       
     A=(SumY-B*SumX)/SumLines;  //截距
     return B;  //返回斜率
+}
+
+void my_steer_init()
+{
+  ftm_pwm_init(FTM3,FTM_CH5,125,1800);
+  //right: 550
+  //middle: 1800
+  //left: 3050
+}
+
+void my_steer_set(int pwm)
+{
+  if(pwm < MY_STEER_RIGHT)
+         pwm = MY_STEER_RIGHT;
+  if(pwm > MY_STEER_LEFT)
+         pwm = MY_STEER_LEFT;
+  
+  ftm_pwm_duty(FTM3,FTM_CH5,pwm);
 }

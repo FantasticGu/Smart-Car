@@ -18,8 +18,7 @@
 //串口打印 “Hello world!”
 void main()
 {
-  
-  
+
   //todo: change tha algo in 大津法 to 计算新的阈值
   
   DisableInterrupts;
@@ -30,10 +29,19 @@ void main()
   ftm_quad_init(FTM2);//ftm正交解码计数初始化
   motor_init();                                    //电机初始化
   steer_init();
+  my_steer_init();
   uart_rx_irq_en(UART_0);
   pit_irq_en(PIT0);
   EnableInterrupts;
-  imagineProcess();
+  /*
+  for(int i = 0;i<10000;i+=100)
+  {
+    PWMSetSteer(i);
+    delayms(50);
+  }
+  */
+
+  //imagineProcess();
 
 }
 

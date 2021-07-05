@@ -13,5 +13,7 @@
 
 void find_edge();//find_edge
 float regression(int startline,int endline,uint16* data);
+void my_steer_init();
+void my_steer_set();
 
 #endif 

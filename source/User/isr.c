@@ -23,6 +23,7 @@ void UART0_ISR(void)
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_RDRF_MASK)   //接收数据寄存器满
   {
     Data=uart_getchar(UART_0);
+    signal_number = Data - '0';
   }
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_TDRE_MASK)  //发送数据寄存器空
   {
