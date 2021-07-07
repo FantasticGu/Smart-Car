@@ -23,7 +23,7 @@ void main()
   
   DisableInterrupts;
   pit_init(PIT0, 100);
-  uart_init(test_port, 256000); 
+  uart_init(test_port, 115200); 
   LQMT9V034_Init();                         
   ftm_quad_init(FTM1);
   ftm_quad_init(FTM2);//ftm正交解码计数初始化
@@ -33,15 +33,9 @@ void main()
   uart_rx_irq_en(UART_0);
   pit_irq_en(PIT0);
   EnableInterrupts;
-  /*
-  for(int i = 0;i<10000;i+=100)
-  {
-    PWMSetSteer(i);
-    delayms(50);
-  }
-  */
-
-  //imagineProcess();
+  //uart_putchar(UART_0,'a');
+  //delayms(100000);
+  imagineProcess();
 
 }
 

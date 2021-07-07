@@ -120,61 +120,61 @@ void ele_direction_control()
         {
             dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
-            /*if(speedflag == 1)
+            if(speedflag == 1)
             {
                 setpoint1 = NORMAL_SPEED+1.5*dir_error;
                 setpoint2 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
             {
-                setpoint1 = NORMAL_SPEED+dir_error;
-                setpoint2 = NORMAL_SPEED;
+                setpoint1 = CIRCLE_SPEED+1*dir_error;
+                setpoint2 = CIRCLE_SPEED;
             }
             else if(speedflag == 5)
             {
               setpoint2 = STOP_SPEED;
                 setpoint1 = STOP_SPEED+1*dir_error;
-            }*/
+            }
         }
         else if(-15>=dir_error && dir_error>=-30)
         {
             dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
-            /*if(speedflag == 1)
+            if(speedflag == 1)
             {
               setpoint1 = NORMAL_SPEED+1*dir_error;
               setpoint2 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
             {
-                setpoint1 = NORMAL_SPEED+dir_error;
-                setpoint2 = NORMAL_SPEED;
+                setpoint1 = CIRCLE_SPEED+1*dir_error;
+                setpoint2 = CIRCLE_SPEED;
             }
             else if(speedflag == 5)
             {
               setpoint2 = STOP_SPEED;
                 setpoint1 = STOP_SPEED+1*dir_error;
-            }*/
+            }
         }
         else if(-5>dir_error && dir_error>-15)
         {
             dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
-            /*if(speedflag == 1)
+            if(speedflag == 1)
             {
-              setpoint1 = NORMAL_SPEED+0.5*dir_error;
+              setpoint1 = NORMAL_SPEED+0.2*dir_error;
               setpoint2 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
             {
-                setpoint1 = NORMAL_SPEED+dir_error;
-                setpoint2 = NORMAL_SPEED;
+                setpoint1 = CIRCLE_SPEED+1*dir_error;
+                setpoint2 = CIRCLE_SPEED;
             }
             else if(speedflag == 5)
             {
               setpoint2 = STOP_SPEED;
                 setpoint1 = STOP_SPEED+1*dir_error;
-            }*/
+            }
         } 
         else if(-5<=dir_error && dir_error<=0)
         {
@@ -208,59 +208,59 @@ void ele_direction_control()
         {
             dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
-           /*if(speedflag == 1)
+           if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-0.5*dir_error;
+              setpoint2 = NORMAL_SPEED-0.2*dir_error;
                 setpoint1 = NORMAL_SPEED;
             }
            else if(speedflag == 2)
             {
-              setpoint2 = NORMAL_SPEED-dir_error;
-                setpoint1 = NORMAL_SPEED;
+              setpoint2 = CIRCLE_SPEED-1*dir_error;
+                setpoint1 = CIRCLE_SPEED;
             }
            else if(speedflag == 5)
             {
               setpoint2 = STOP_SPEED-1*dir_error;
                 setpoint1 = STOP_SPEED;
-            }*/
+            }
         }
         else if(15<dir_error && dir_error<30)
         {
             dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
-            /*if(speedflag == 1)
+            if(speedflag == 1)
             {
               setpoint2 = NORMAL_SPEED-1*dir_error;
               setpoint1 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
             {
-              setpoint2 = NORMAL_SPEED-dir_error;
-                setpoint1 = NORMAL_SPEED;
+              setpoint2 = CIRCLE_SPEED-1*dir_error;
+                setpoint1 = CIRCLE_SPEED;
             }
             else if(speedflag == 5)
             {
               setpoint2 = STOP_SPEED-1*dir_error;
                 setpoint1 = STOP_SPEED;
-            }*/
+            }
         }else if(30<=dir_error)
         {
             dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
-            /*if(speedflag == 1)
+            if(speedflag == 1)
             {
               setpoint2 = NORMAL_SPEED-1.5*dir_error;
               setpoint1 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
             {
-              setpoint2 = NORMAL_SPEED-dir_error;
-                setpoint1 = NORMAL_SPEED;
+              setpoint2 = CIRCLE_SPEED-1*dir_error;
+              setpoint1 = CIRCLE_SPEED;
             }else if(speedflag == 5)
             {
               setpoint2 = STOP_SPEED-1*dir_error;
                 setpoint1 = STOP_SPEED;
-            }*/
+            }
         }
         
         
@@ -269,7 +269,7 @@ void ele_direction_control()
         
         //uart_printf(UART_0,"output = %f\n",dir_P_value);
         
-        dir_control_D=0.125;
+        dir_control_D=0.1;
         dir_D_value=dir_control_D*(dir_error-last_dir_error);
         
         g_fDirectionControlOut=dir_P_value+dir_D_value; 

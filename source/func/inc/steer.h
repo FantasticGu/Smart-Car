@@ -21,9 +21,9 @@
 #define STEER_DOUBLE 0
 
 
-#define STEER_LEFT      1430     //舵机摆角左极限  这里的值是用于测试的，大家根据自己的舵机更改
+#define STEER_LEFT      1400     //舵机摆角左极限  这里的值是用于测试的，大家根据自己的舵机更改
 #define STEER_MIDDLE    1250     //舵机摆角中值
-#define STEER_RIGHT     1070   //舵机摆角右极限  
+#define STEER_RIGHT     1100   //舵机摆角右极限  
 
 
 #define  STEER_FTMN     FTM3

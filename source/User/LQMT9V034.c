@@ -31,8 +31,7 @@ int OFFSET1=0;      //第二格
 int OFFSET2=0;      //最近，第三格
 int TXV=0;          //梯形的左高度，右高度
 
-int signal_number = 1;
-int real_signal_number = 1;
+
 
 
 
@@ -166,19 +165,27 @@ static unsigned int queue_cnt = 0;
 
 int DIRECTION = 0; //0:逆时针，1：顺时针。
 
-int TOTAL_STATUS[] = {START_STATUS,THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,
-                      THREE_ROAD_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};
+int TOTAL_STATUS[] = {START_STATUS,
+                     //CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,
+                      THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
+                      CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS,
+                      THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
+                      CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};
 
 
 //{START_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,THREE_ROAD_STATUS,
 //                     CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,THREE_ROAD_STATUS,STOP_STATUS};
 
 
-
+int april_tag_position = 0; //left: 0, right: 1
 
 int STATUS_NOW = 0;
     
 int ready_to_stop = 0;
+
+int signal_number = 1;
+int real_signal_number = 1;
+int april_tag_number = 0;
 
 int LAP_NUM = 0;
 
@@ -354,7 +361,7 @@ void imagineProcess(void)
                {
                  Pick_table[i] = Bline_right[i]-50;
                }
-               if(cnt_6 > 20 && judgeLeft(25,35,15) == 1)
+               if(cnt_6 > 10 && judgeLeft(25,35,15) == 1)
                {
                  cnt_6 = 0;
                  rstatus = 7;
@@ -526,7 +533,6 @@ void imagineProcess(void)
             }
           }
             
-          static int cnt_cross = 0;
           static int cstatus = 0;       
           static int angle_status = 0;
           
@@ -574,11 +580,15 @@ void imagineProcess(void)
                {
                  if(LAP_NUM == 0)
                  {
-                   setpoint1 = setpoint2 = -50;
-                   delayms(300);
+                    setpoint1 = setpoint2 = -40;
+                    delayms(300);
                    setpoint1 = setpoint2 = -20;
-                   delayms(300);
-                   real_siganal_number = signal_number;
+                   uart_putchar(UART_0,'n');
+                   delayms(500);
+                   //real_signal_number = signal_number;
+                   //setpoint1 = setpoint2 = -50;
+                   //delayms(200);
+                   
                    if( real_signal_number % 2)
                    {
                       angle_status = 2; 
@@ -614,6 +624,11 @@ void imagineProcess(void)
                if(angle_in_cnt > 10)
                {
                  angle_status = 3;
+                 STATUS_NOW++;
+                 if(april_tag_position == 1)
+                 {
+                   STATUS_NOW++;
+                 }
                  angle_in_cnt = 0;
                }
             }
@@ -654,6 +669,11 @@ void imagineProcess(void)
                {
                  angle_status = 6;
                  angle_in_cnt = 0;
+                 STATUS_NOW++;
+                 if(april_tag_position == 0)
+                 {
+                   STATUS_NOW++;
+                 }
                }
             }
             
@@ -760,7 +780,6 @@ void imagineProcess(void)
             
             if(sstatus == 1)
             {
-              static int start_cnt = 0;
                start_cnt++;
                if(start_cnt < 50)
                {
@@ -789,113 +808,170 @@ void imagineProcess(void)
             }
           }
           
-           
-          static int havestop = 0;
-          static int stopflag = 0;
-          int jumppoint = 0;
-          if(!havestop)
-          {
-            for(int i = H-41;i>H-61;i--)
-            {
-              for(int j = V-10;j>V-185;j--)
+           if(status == STOP_STATUS)
+           {
+              static int stopflag = 0;
+              int jumppoint = 0;
+              if(!stopflag)
               {
-                if(Image_Data[i][j-2]>Cmp && Image_Data[i][j-1]>Cmp 
-                  && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp )
+                for(int i = H-41;i>H-61;i--)
                 {
-                  jumppoint++;
+                  for(int j = V-10;j>V-185;j--)
+                  {
+                    if(Image_Data[i][j-2]>Cmp && Image_Data[i][j-1]>Cmp 
+                      && Image_Data[i][j]<Cmp && Image_Data[i][j+1]<Cmp )
+                    {
+                      jumppoint++;
+                    }
+                  }
+                  if(jumppoint > 8)
+                  {
+                    if(!LAP_NUM)
+                    {
+                      stopflag = 1;
+                      LAP_NUM = 1;
+                      break;
+                    }
+                    else
+                    {
+                      ready_to_stop = 1;
+                      setpoint1 = setpoint2 = STOP_SPEED;
+                      if(!DIRECTION)
+                      {
+                        stopflag = 3;
+                      }
+                      else
+                      {
+                        stopflag = 4;
+                      }
+                      break;
+                    }
+                  }
+                    jumppoint = 0;
+                    if(stopflag)
+                    {
+                      break;
+                    }
                 }
               }
-              if(jumppoint > 8)
+              
+              if(stopflag == 1)
               {
-                if(status != STOP_STATUS)
+                 static int stop_cnt = 0;
+                 if(!DIRECTION)
+                 {
+                   for(int i = H-21;i>H-41;i--)
+                   {
+                      Pick_table[i] = Bline_right[i]-50;
+                   }
+                 }
+                 else
+                 {
+                   for(int i = H-21;i>H-41;i--)
+                   {
+                      Pick_table[i] = Bline_left[i]+50;
+                   }
+                 }
+                 
+                 stop_cnt++;
+                 if(stop_cnt>25)
+                 {
+                   stop_cnt = 0;
+                   stopflag = 0;
+                   STATUS_NOW++;
+                 }
+              }
+              
+              if(stopflag == 3)
+              {
+                 static int black_cnt = 0;
+                 for(int i = H-21;i>H-41;i--)
+                 {
+                    Pick_table[i] = Bline_left[i]+40;
+                 }
+                 black_cnt++;
+                 if(black_cnt>20)
+                 {
+                   havestop=1;
+                   setpoint1 = setpoint2 = 0;
+                   delayms(100000);
+                 }
+                 
+              }
+              
+              if(stopflag == 4)
+              {
+                 static int black_cnt = 0;
+                 for(int i = H-21;i>H-41;i--)
+                 {
+                    Pick_table[i] = Bline_right[i]-50;
+                 }
+                 black_cnt++;
+                 if(black_cnt>20)
+                 {
+                   havestop=1;
+                   setpoint1 = setpoint2 = 0;
+                   delayms(100000);
+                 }
+                 
+              }
+              
+           }
+          static int april_tag_cnt = 0;
+          static int april_tag_status = 0;
+          if(status == APRIL_TAG_STATUS)
+          {
+            if(april_tag_status == 0)
+            {
+              int jumppoint = 0;
+              for(int i = H-21;i>H-41;i--)
+              {
+                for(int j = Bline_left[i]+5;j<Bline_right[i]-5;j++)
                 {
-                  stopflag = 1;
-                  LAP_NUM = 1;
-                  break;
-                }
-                else
-                {
-                  ready_to_stop = 1;
-                  setpoint1 = setpoint2 = STOP_SPEED;
-                  if(!DIRECTION)
+                  if(Image_Data[i][j-1]>Cmp && Image_Data[i][j]<Cmp 
+                     || Image_Data[i][j-1]<Cmp && Image_Data[i][j]>Cmp)
                   {
-                    stopflag = 3;
+                    jumppoint++;
+                  }
+                }
+                if(jumppoint >= 4)
+                {
+                  PWMSetSteer(1250);
+                  setpoint1 = setpoint2 = -50;
+                  delayms(700);
+                  setpoint1 = setpoint2 = 0;
+                  uart_putchar(UART_0,'a');
+                  delayms(1000);
+                  april_tag_number = signal_number;
+                  if(april_tag_number % 2)
+                  {
+                    my_steer_set(550);
                   }
                   else
                   {
-                    stopflag = 4;
+                    my_steer_set(3050);
                   }
+                  delayms(500);
+                  my_steer_set(1800);
+                  setpoint1 = setpoint2 = NORMAL_SPEED;              
+                  april_tag_status = 1;
                   break;
                 }
               }
-                jumppoint = 0;
-                if(stopflag)
-                {
-                  break;
-                }
             }
+            
+            if(april_tag_status == 1)
+            {
+              april_tag_cnt++;
+              if(april_tag_cnt > 30)
+              {
+                april_tag_cnt = 0;
+                april_tag_status = 0;
+                STATUS_NOW++;
+              }
+            }
+            
           }
-          
-          if(stopflag == 1)
-          {
-             static int stop_cnt = 0;
-             if(!DIRECTION)
-             {
-               for(int i = H-21;i>H-41;i--)
-               {
-                  Pick_table[i] = Bline_right[i]-50;
-               }
-             }
-             else
-             {
-               for(int i = H-21;i>H-41;i--)
-               {
-                  Pick_table[i] = Bline_left[i]+50;
-               }
-             }
-             
-             stop_cnt++;
-             if(stop_cnt>25)
-             {
-               stop_cnt = 0;
-               stopflag = 2;
-             }
-          }
-          
-          if(stopflag == 3)
-          {
-             static int black_cnt = 0;
-             for(int i = H-21;i>H-41;i--)
-             {
-                Pick_table[i] = Bline_left[i]+40;
-             }
-             black_cnt++;
-             if(black_cnt>20)
-             {
-               havestop=1;
-               setpoint1 = setpoint2 = 0;
-               delayms(100000);
-             }
-             
-          }
-          
-          if(stopflag == 4)
-          {
-             static int black_cnt = 0;
-             for(int i = H-21;i>H-41;i--)
-             {
-                Pick_table[i] = Bline_right[i]-50;
-             }
-             black_cnt++;
-             if(black_cnt>20)
-             {
-               havestop=1;
-               setpoint1 = setpoint2 = 0;
-               delayms(100000);
-             }
-             
-          }
-          
             
       
           //uart_printf(UART_0,"right = %d\n",readyright);

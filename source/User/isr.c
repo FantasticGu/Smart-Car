@@ -24,10 +24,13 @@ void UART0_ISR(void)
   {
     Data=uart_getchar(UART_0);
     signal_number = Data - '0';
+    //setpoint1 = setpoint2 = -10;
+    //my_steer_set(3050);
+    //uart_putchar(UART_0,Data);
   }
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_TDRE_MASK)  //发送数据寄存器空
   {
-    uart_putchar(UART_0,Data);
+    //uart_putchar(UART_0,Data);
   }
   EnableInterrupts;   //开总中断
 }
