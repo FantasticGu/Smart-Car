@@ -14,14 +14,14 @@ extern uint16 bigbendflag;
 float in1,out1,in2,out2,lastin1,lastin2=0;
 float setpoint1=NORMAL_SPEED;
 float setpoint2=NORMAL_SPEED;
-float p1=120.0;
-float p2=120.0;
+float p1=100.0;
+float p2=100.0;
 float i1=0.0;
 float i2=0.0;
 float d1=1;
 float d2=1;
-float max_speed=8000;
-float min_speed=-8000;
+float max_speed=7000;
+float min_speed=-7000;
 float iterm1=0;
 float iterm2=0;
 
@@ -122,7 +122,7 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
             if(speedflag == 1)
             {
-                setpoint1 = NORMAL_SPEED+1.5*dir_error;
+                setpoint1 = NORMAL_SPEED+1*dir_error;
                 setpoint2 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
@@ -162,7 +162,7 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
             if(speedflag == 1)
             {
-              setpoint1 = NORMAL_SPEED+0.2*dir_error;
+              setpoint1 = NORMAL_SPEED+1*dir_error;
               setpoint2 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
@@ -178,7 +178,7 @@ void ele_direction_control()
         } 
         else if(-5<=dir_error && dir_error<=0)
         {
-            dir_control_P=5;
+            dir_control_P=4;
             dir_P_value=dir_control_P*dir_error;
            if(speedflag == 1)
             {
@@ -192,7 +192,7 @@ void ele_direction_control()
         }
         else if(0<=dir_error && dir_error<=5)
         {
-            dir_control_P=5;
+            dir_control_P=4;
             dir_P_value=dir_control_P*dir_error;
            if(speedflag == 1)
             {
@@ -210,7 +210,7 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
            if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-0.2*dir_error;
+              setpoint2 = NORMAL_SPEED-1*dir_error;
                 setpoint1 = NORMAL_SPEED;
             }
            else if(speedflag == 2)
@@ -249,7 +249,7 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
             if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-1.5*dir_error;
+              setpoint2 = NORMAL_SPEED-1*dir_error;
               setpoint1 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
@@ -269,7 +269,7 @@ void ele_direction_control()
         
         //uart_printf(UART_0,"output = %f\n",dir_P_value);
         
-        dir_control_D=0.1;
+        dir_control_D=0.125;
         dir_D_value=dir_control_D*(dir_error-last_dir_error);
         
         g_fDirectionControlOut=dir_P_value+dir_D_value; 

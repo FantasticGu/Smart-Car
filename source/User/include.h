@@ -49,8 +49,8 @@ typedef struct
 //#define Cmp 160//摄像头二值化阈值
 
 #define NORMAL_SPEED 100//110 //90
-#define CIRCLE_SPEED 95//105 //85
-#define CROSS_SPEED 98//108  //88
+#define CIRCLE_SPEED 100//105 //85
+#define CROSS_SPEED 100//108  //88
 #define START_SPEED 80 //85
 #define STOP_SPEED 80
 

@@ -180,6 +180,7 @@ int TOTAL_STATUS[] = {START_STATUS,
 int april_tag_position = 0; //left: 0, right: 1
 
 int STATUS_NOW = 0;
+int STATUS_LAST = 0;
     
 int ready_to_stop = 0;
 
@@ -220,6 +221,14 @@ void imagineProcess(void)
           right_slope /= 5;
           static int start_cnt = 0;
           
+          /*if(STATUS_LAST != STATUS_NOW)
+          {
+            setpoint1 = setpoint2 = 0;
+            delayms(500);
+            setpoint1 = setpoint2 = NORMAL_SPEED;
+          }*/
+          
+          STATUS_LAST = STATUS_NOW;
           int status = TOTAL_STATUS[STATUS_NOW];
           //valid_line=GetValidLine();
          //uart_printf(UART_0,"line =  %d\n",valid_line);
@@ -361,7 +370,7 @@ void imagineProcess(void)
                {
                  Pick_table[i] = Bline_right[i]-50;
                }
-               if(cnt_6 > 10 && judgeLeft(25,35,15) == 1)
+               if(cnt_6 > 20 && judgeLeft(25,35,15) == 1)
                {
                  cnt_6 = 0;
                  rstatus = 7;
@@ -425,7 +434,7 @@ void imagineProcess(void)
                 int r = 0;
                 for(int j = H-11;j>H-41;j--)
                 {
-                  if(Bline_right[j]<173)
+                  if(Bline_right[j]<180)
                   {
                     r++;
                   }
@@ -444,12 +453,12 @@ void imagineProcess(void)
               {
                 Pick_table[i] = Bline_right[i]-60;
               }
-              if(judgeLeft(35,45,23) == 1)
+              if(judgeLeft(35,45,15) == 1)
               {
                 cnt_1 = 0;
                 lstatus = 2;
               }
-                if(cnt_1 > 35)
+              if(cnt_1 > 35)
               {
                 cnt_1 = 0;
                 lstatus = 0;
@@ -460,7 +469,7 @@ void imagineProcess(void)
             {               
               static int cnt_2 = 0;
               cnt_2++;
-              if(cnt_2 > 25)
+              if(cnt_2 > 30)
               {
                 cnt_2 = 0;
                 lstatus = 0;
@@ -508,7 +517,7 @@ void imagineProcess(void)
               {
                 Pick_table[i] = Bline_left[i]+50;
               }
-              if(cnt_5>15 && judgeRight(25,35,170)==0)
+              if(cnt_5>20 && judgeRight(25,35,170)==0)
               {
                 cnt_5 = 0;
                 lstatus = 7;
@@ -580,14 +589,14 @@ void imagineProcess(void)
                {
                  if(LAP_NUM == 0)
                  {
-                    setpoint1 = setpoint2 = -40;
-                    delayms(300);
-                   setpoint1 = setpoint2 = -20;
+                   setpoint1 = setpoint2 = -40;
+                   delayms(300);
+                   setpoint1 = setpoint2 = 0;
                    uart_putchar(UART_0,'n');
+                   delayms(5000);
+                   real_signal_number = signal_number;
+                   setpoint1 = setpoint2 = -20;
                    delayms(500);
-                   //real_signal_number = signal_number;
-                   //setpoint1 = setpoint2 = -50;
-                   //delayms(200);
                    
                    if( real_signal_number % 2)
                    {
@@ -618,10 +627,10 @@ void imagineProcess(void)
                static int angle_in_cnt = 0;
                for(int i = H-21;i>H-41;i--)
                 {
-                   Pick_table[i] = 50;
+                   Pick_table[i] = Bline_left[i]+50;
                 }
                angle_in_cnt++;
-               if(angle_in_cnt > 10)
+               if(angle_in_cnt > 20 && LAP_NUM ==0 || angle_in_cnt > 10 && LAP_NUM ==1)
                {
                  angle_status = 3;
                  STATUS_NOW++;
@@ -635,7 +644,7 @@ void imagineProcess(void)
             
             if(angle_status == 3)
             {
-              if(left_slope > 0.2 && right_slope < -0.2)
+              if(left_slope > 0.1 && right_slope < -0.1)
               {
                 angle_status = 4;
               }
@@ -649,7 +658,7 @@ void imagineProcess(void)
                    Pick_table[i] = Bline_left[i]+50;
                 }
                angle_out_cnt++;
-               if(angle_out_cnt > 20)
+               if(angle_out_cnt > 10)
                {
                  angle_status = 0;
                  angle_out_cnt = 0;
@@ -662,10 +671,10 @@ void imagineProcess(void)
                static int angle_in_cnt = 0;
                for(int i = H-21;i>H-41;i--)
                 {
-                   Pick_table[i] = 130;
+                   Pick_table[i] = Bline_right[i]-50;
                 }
                angle_in_cnt++;
-               if(angle_in_cnt > 10)
+               if(angle_in_cnt > 20  && LAP_NUM ==0 || angle_in_cnt > 10 && LAP_NUM ==1)
                {
                  angle_status = 6;
                  angle_in_cnt = 0;
@@ -679,7 +688,7 @@ void imagineProcess(void)
             
             if(angle_status == 6)
             {
-              if(left_slope > 0.2 && right_slope < -0.2)
+              if(left_slope > 0.1 && right_slope < -0.1)
               {
                 angle_status = 7;
               }
@@ -717,7 +726,7 @@ void imagineProcess(void)
              {
                static int cnt_c1 = 0;
                cnt_c1++;
-               if(cnt_c1 > 30)
+               if(cnt_c1 > 20)
                {
                  cnt_c1 = 0;
                  cstatus = 0;
@@ -953,6 +962,7 @@ void imagineProcess(void)
                   }
                   delayms(500);
                   my_steer_set(1800);
+                  delayms(500);
                   setpoint1 = setpoint2 = NORMAL_SPEED;              
                   april_tag_status = 1;
                   break;
