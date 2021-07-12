@@ -46,7 +46,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>3191358056</Checksum>
+        <Checksum>2954266576</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -103,18 +103,19 @@
         <A5>_ "C:\Users\16078\Desktop\K66四轮摄像头\source\Startup\start.c" ""</A5>
         <A6>_ "C:\Users\16078\Desktop\Smart-Car\source\Libs\core_cm4.h" ""</A6>
         <A7>_ "C:\Users\16078\Desktop\Smart-Car\source\Startup\start.c" ""</A7>
-        <A8>_ "D:\智能车\source\Startup\start.c" ""</A8>
-        <A9>_ "D:\智能车\source\User\main.c" ""</A9>
-        <A10>_ "D:\智能车\znc\source\drivers\src\PIT.c" ""</A10>
-        <A11>_ "D:\材料\znc（待调角度系数）\source\Startup\start.c" ""</A11>
-        <A12>_ "D:\材料\znc（待调角度系数）\source\Startup\vectors.c" ""</A12>
-        <A13>_ "D:\材料\智能车\znc\source\Libs\core_cm4.h" "C:\Users\13216\Desktop\智能车\2019.7.4\source\Libs\core_cm4.h"</A13>
-        <A14>_ "D:\材料\智能车\znc\source\Startup\start.c" "C:\Users\13216\Desktop\智能车\znc - 更换十字算法\source\Startup\start.c"</A14>
-        <A15>_ "D:\材料\智能车\znc\source\Startup\vectors.c" ""</A15>
-        <A16>_ "D:\材料\智能车\znc\source\drivers\src\FTM.c" "C:\Users\13216\Desktop\智能车\2019.7.5.22\source\drivers\src\FTM.c"</A16>
-        <A17>_ "D:\材料\智能车\znc\source\drivers\src\GPIO.c" "C:\Users\13216\Desktop\智能车\2019.7.5.22\source\drivers\src\GPIO.c"</A17>
-        <A18>_ "D:\材料\智能车\znc\source\func\src\motor.c" "C:\Users\13216\Desktop\智能车\2019.6.29.18\source\func\src\motor.c"</A18>
-        <Count>19</Count>
+        <A8>_ "C:\Users\16078\Desktop\Smart-Car\source\drivers\src\PIT.c" ""</A8>
+        <A9>_ "D:\智能车\source\Startup\start.c" ""</A9>
+        <A10>_ "D:\智能车\source\User\main.c" ""</A10>
+        <A11>_ "D:\智能车\znc\source\drivers\src\PIT.c" ""</A11>
+        <A12>_ "D:\材料\znc（待调角度系数）\source\Startup\start.c" ""</A12>
+        <A13>_ "D:\材料\znc（待调角度系数）\source\Startup\vectors.c" ""</A13>
+        <A14>_ "D:\材料\智能车\znc\source\Libs\core_cm4.h" "C:\Users\13216\Desktop\智能车\2019.7.4\source\Libs\core_cm4.h"</A14>
+        <A15>_ "D:\材料\智能车\znc\source\Startup\start.c" "C:\Users\13216\Desktop\智能车\znc - 更换十字算法\source\Startup\start.c"</A15>
+        <A16>_ "D:\材料\智能车\znc\source\Startup\vectors.c" ""</A16>
+        <A17>_ "D:\材料\智能车\znc\source\drivers\src\FTM.c" "C:\Users\13216\Desktop\智能车\2019.7.5.22\source\drivers\src\FTM.c"</A17>
+        <A18>_ "D:\材料\智能车\znc\source\drivers\src\GPIO.c" "C:\Users\13216\Desktop\智能车\2019.7.5.22\source\drivers\src\GPIO.c"</A18>
+        <A19>_ "D:\材料\智能车\znc\source\func\src\motor.c" "C:\Users\13216\Desktop\智能车\2019.6.29.18\source\func\src\motor.c"</A19>
+        <Count>20</Count>
         <SuppressDialog>1</SuppressDialog>
     </Aliases>
 </settings>

@@ -95,6 +95,10 @@ void setbinary(void);
 
 extern u8  Field_Over_Flag;
 
+#define CAMERA_MAX_EXPOSURE_TIME  500
+#define CAMERA_MIN_EXPOSURE_TIME  100
+#define CAMERA_EXPOSURE_TIME  1500
+
 
 
 #define MT9V034_I2C_ADDR	                    0xB8 //(0xB8 >> 1)=0x5C

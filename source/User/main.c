@@ -23,16 +23,19 @@ void main()
   
   DisableInterrupts;
   pit_init(PIT0, 100);
-  uart_init(test_port, 115200); 
+  uart_init(test_port, 256000); 
   LQMT9V034_Init();                         
   ftm_quad_init(FTM1);
   ftm_quad_init(FTM2);//ftm正交解码计数初始化
-  motor_init();                                    //电机初始化
+  motor_init();       //电机初始化
   steer_init();
+  gpio_init(PTD12,GPO,0);
   my_steer_init();
   uart_rx_irq_en(UART_0);
   pit_irq_en(PIT0);
   EnableInterrupts;
+  //delayms(100);
+  //ftm_pwm_duty(FTM3,FTM_CH7,5000);
   //uart_putchar(UART_0,'a');
   //delayms(100000);
   imagineProcess();

@@ -122,12 +122,12 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
             if(speedflag == 1)
             {
-                setpoint1 = NORMAL_SPEED+1*dir_error;
+                setpoint1 = NORMAL_SPEED+2.5*dir_error;
                 setpoint2 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
             {
-                setpoint1 = CIRCLE_SPEED+1*dir_error;
+                setpoint1 = CIRCLE_SPEED+2.5*dir_error;
                 setpoint2 = CIRCLE_SPEED;
             }
             else if(speedflag == 5)
@@ -176,7 +176,7 @@ void ele_direction_control()
                 setpoint1 = STOP_SPEED+1*dir_error;
             }
         } 
-        else if(-5<=dir_error && dir_error<=0)
+        else if(-5<=dir_error && dir_error<0)
         {
             dir_control_P=4;
             dir_P_value=dir_control_P*dir_error;
@@ -224,7 +224,7 @@ void ele_direction_control()
                 setpoint1 = STOP_SPEED;
             }
         }
-        else if(15<dir_error && dir_error<30)
+        else if(15<=dir_error && dir_error<30)
         {
             dir_control_P=5;
             dir_P_value=dir_control_P*dir_error;
@@ -249,12 +249,12 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
             if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-1*dir_error;
+              setpoint2 = NORMAL_SPEED-2.5*dir_error;
               setpoint1 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
             {
-              setpoint2 = CIRCLE_SPEED-1*dir_error;
+              setpoint2 = CIRCLE_SPEED-2.5*dir_error;
               setpoint1 = CIRCLE_SPEED;
             }else if(speedflag == 5)
             {
@@ -264,8 +264,8 @@ void ele_direction_control()
         }
         
         
-        if(dir_P_value<-200)dir_P_value=-200;
-        if(dir_P_value>200)dir_P_value=200;
+        if(dir_P_value<-160)dir_P_value=-160;
+        if(dir_P_value>160)dir_P_value=160;
         
         //uart_printf(UART_0,"output = %f\n",dir_P_value);
         

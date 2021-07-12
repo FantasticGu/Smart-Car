@@ -14,7 +14,7 @@ unsigned int row=0;	//摄像头行计数，最大240
 uint16 Bline_left[H];	 //左边线存放数组
 uint16 Bline_right[H];	 //右边线存放数组
 uint16 Pick_table[H];	 //中心线存放数组
-uint8 Cmp=180;	//黑线阈值
+uint8 Cmp=95;	//黑线阈值
 
 uint8 GetAvg(uint8 data[120][188],int row,int col)
 {
@@ -39,8 +39,9 @@ int lastmiddleplace= 94;
 
 void find_edge()
 {
-  uint8 tmp = GetAvg(Image_Data,120,188);//GetOSTU(Image_Data);
-  Cmp = (int)(Cmp*0.875+tmp*(1-0.875));
+  //uint8 tmp = GetAvg(Image_Data,120,188) - 20;//GetOSTU(Image_Data);
+  //Cmp = (int)(Cmp*0.875+tmp*(1-0.875));
+  //Cmp = (int)GetAvg(Image_Data,120,188)-20;
 
    for(int line=0;line<H;line++)
     {
@@ -51,7 +52,7 @@ void find_edge()
               
     int j;
                      
-    for(int i=H-1;i>H-41;i--)
+    for(int i=H-1;i>H-81;i--)
     {
         //找左边线
         if(i == H-1)
@@ -157,7 +158,8 @@ float regression(int startline,int endline,uint16* data)
 
 void my_steer_init()
 {
-  ftm_pwm_init(FTM3,FTM_CH5,125,1800);
+  ftm_pwm_init(FTM3,FTM_CH3,125,1800);
+  ftm_pwm_init(FTM3,FTM_CH7,125,5000);
   //right: 550
   //middle: 1800
   //left: 3050
@@ -170,5 +172,5 @@ void my_steer_set(int pwm)
   if(pwm > MY_STEER_LEFT)
          pwm = MY_STEER_LEFT;
   
-  ftm_pwm_duty(FTM3,FTM_CH5,pwm);
+  ftm_pwm_duty(FTM3,FTM_CH3,pwm);
 }

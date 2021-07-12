@@ -50,8 +50,8 @@ typedef struct
 
 #define NORMAL_SPEED 100//110 //90
 #define CIRCLE_SPEED 100//105 //85
-#define CROSS_SPEED 100//108  //88
-#define START_SPEED 80 //85
+#define CROSS_SPEED 80//108  //88
+#define START_SPEED 70 //85
 #define STOP_SPEED 80
 
 #define KEY1 0x01

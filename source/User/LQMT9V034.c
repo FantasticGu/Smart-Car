@@ -109,6 +109,8 @@ void SendPicture(void)
 
 
 int rstatus = 0;
+int lastrstatus = 0;
+int lastlstatus = 0;
 int lstatus = 0;
 int havestop = 0;
 int incross = 0;
@@ -165,12 +167,33 @@ static unsigned int queue_cnt = 0;
 
 int DIRECTION = 0; //0:逆时针，1：顺时针。
 
-int TOTAL_STATUS[] = {START_STATUS,
+/*int TOTAL_STATUS[] = {START_STATUS,
                      //CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,
                       THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
                       CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS,
                       THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
-                      CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};
+                      CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};*/
+
+int TOTAL_STATUS[] =
+/*{START_STATUS,
+                      CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,
+                      THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
+                      CIRCLE_STATUS,
+                      STOP_STATUS,
+                      CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,
+                      THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
+                      CIRCLE_STATUS,STOP_STATUS
+}; */
+
+
+{START_STATUS,
+                      CIRCLE_STATUS,
+                      THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
+                      CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,
+                      STOP_STATUS,
+                      CIRCLE_STATUS,
+                      THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
+                      CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};
 
 
 //{START_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,THREE_ROAD_STATUS,
@@ -184,9 +207,10 @@ int STATUS_LAST = 0;
     
 int ready_to_stop = 0;
 
-int signal_number = 1;
-int real_signal_number = 1;
+int signal_number = 2;
+int real_signal_number = 2;
 int april_tag_number = 0;
+int april_tag_in_three_road = 1;
 
 int LAP_NUM = 0;
 
@@ -194,6 +218,9 @@ void queue_in(float* queue,float data)
 {
   queue[(queue_cnt++)%5] = data;
 }
+
+
+
 
 void imagineProcess(void)
 {
@@ -221,30 +248,63 @@ void imagineProcess(void)
           right_slope /= 5;
           static int start_cnt = 0;
           
-          /*if(STATUS_LAST != STATUS_NOW)
+          if(STATUS_LAST != STATUS_NOW)
           {
-            setpoint1 = setpoint2 = 0;
-            delayms(500);
-            setpoint1 = setpoint2 = NORMAL_SPEED;
-          }*/
+            //setpoint1 = setpoint2 = 0;
+            //delayms(500);
+            //setpoint1 = setpoint2 = NORMAL_SPEED;
+            gpio_set(PTD12,1);
+          }else
+          {
+            gpio_set(PTD12,0);
+          }
           
           STATUS_LAST = STATUS_NOW;
-          int status = TOTAL_STATUS[STATUS_NOW];
-          //valid_line=GetValidLine();
-         //uart_printf(UART_0,"line =  %d\n",valid_line);
+          
+          int status = TOTAL_STATUS[STATUS_NOW]; 
           
           
-         /*for(int i = H -21;i>H-41;i--)
+          /*if(1)
+          {
+            int back_left = H-11;
+            int front_left = H-61
+            for(int i = H-11;i<H-81;i--)
+            {
+              if(Bline_left[i] >= Bline_left[i+1] && Bline_left[i-1] >= Bline_left[i] && Bline_left[i-2]-Bline_left[i-1] < -3)
+              {
+                
+                
+              }
+            }
+          }*/
+            
+          
+          
+                    
+         /*for(int i = H-11;i>H-61;i--)
           {
             uart_printf(UART_0,"%d %d %d \n",Bline_left[i],Pick_table[i],Bline_right[i]);
             delayms(50);
-          }*/
+          }
          //uart_printf(UART_0,"%f %f \n",left_slope,right_slope);
-         //uart_printf(UART_0,"\n\n");
+         uart_printf(UART_0,"\n\n");*/
           
           if(status == CIRCLE_STATUS)
           {
-             if(judgeRight(31,41,180) == 1 && judgeRight(16,26,170) == 0)
+            
+            if(lastrstatus != rstatus || lastlstatus != lstatus)
+            {
+              gpio_set(PTD12,1);
+            }else
+            {
+              gpio_set(PTD12,0);
+            }
+            
+            lastrstatus = rstatus;
+            lastlstatus = lstatus;
+            
+            
+             if(judgeRight(31,41,180) == 1 && judgeRight(16,26,170) == 0 && !rstatus && !lstatus)
              {
                int p1 = 0;
                int p2 = 0;
@@ -276,7 +336,7 @@ void imagineProcess(void)
                  }
                  
                }
-               if(p1 && p2 && p3 && abs(p2-p1)<10 && abs(p3-p2)<10 && abs(p3-p1)<20)
+               if(p1 && p2 && p3 && abs(p2-p1)<15 && abs(p3-p2)<15 && abs(p3-p1)<30)
                {
                  int l = 0;
                  for(int j = H-11;j>H-41;j--)
@@ -296,11 +356,11 @@ void imagineProcess(void)
              {
                static int cnt_1 = 0;
                cnt_1++;
-               for(int i = H-11;i>H-41;i--)
+               for(int i = H-21;i>H-41;i--)
                {
                  Pick_table[i] = Bline_left[i]+60;
                }
-               if(judgeRight(35,45,165) == 0)
+               if(cnt_1 > 5 && judgeRight(20,30,168) == 0)
                {
                  cnt_1 = 0;
                  rstatus = 2;
@@ -322,7 +382,7 @@ void imagineProcess(void)
                  cnt_2 = 0;
                  rstatus = 0;
                }
-               if(judgeRight(25,35,180)==1)
+               if(judgeRight(25,35,175)==1)
                {
                  cnt_2 = 0;
                  rstatus = 3;
@@ -336,9 +396,9 @@ void imagineProcess(void)
                  cnt_3++;
                   for(int i = H-11;i>H-41;i--)
                  {
-                   Pick_table[i] = Bline_right[i]-40;
+                   Pick_table[i] = Bline_right[i]-45;
                  }
-                 if(cnt_3 > 10)
+                 if(cnt_3 > 6)
                  {
                    cnt_3 = 0;
                    rstatus = 4;
@@ -350,7 +410,7 @@ void imagineProcess(void)
              {
                static int cnt_4 = 0;
                    cnt_4++;
-                   if(cnt_4>50)
+                   if(cnt_4>20)
                    {
                      if(judgeLeft(15,25,10) == 0)
                      {
@@ -370,7 +430,7 @@ void imagineProcess(void)
                {
                  Pick_table[i] = Bline_right[i]-50;
                }
-               if(cnt_6 > 20 && judgeLeft(25,35,15) == 1)
+               if(cnt_6 > 10 && judgeLeft(15,25,15) == 1)
                {
                  cnt_6 = 0;
                  rstatus = 7;
@@ -387,7 +447,7 @@ void imagineProcess(void)
                {
                  Pick_table[i] = Bline_left[i]+50;
                }
-               if(cnt_7 > 20)
+               if(cnt_7 > 30 || cnt_7 > 15 && judgeLeft(20,40,20) == 1 && judgeRight(20,40,170) == 0)
                {
                  cnt_7 = 0;
                  rstatus = 0;
@@ -397,14 +457,32 @@ void imagineProcess(void)
           
               
               
-            if(judgeLeft(31,41,8) == 0 && judgeLeft(16,26,18) == 1)
+            /*for(int i = H-15;i>H-35;i--)
             {
+              if(Bline_left[i+1]>30 && Bline_left[i]>30 && Bline_left[i-1]< 5 && Bline_left[i-2] < 5)
+              {
+                if(right_slope > 0.1)
+                {
+                  lstatus = 1;
+                  break;
+                }
+              }
+              
+            }*/
+             
+             
+            if(judgeLeft(31,41,8) == 0 && judgeLeft(16,26,18) == 1 && !rstatus && !lstatus)
+            {
+              /*if(right_slope > 0.1)
+              {
+                lstatus = 1;
+              }*/
               int p1 = 0;
               int p2 = 0;
               int p3 = 0;
               for(int j = H-11;j>H-14;j--)
               {
-                if (Bline_right[j]<183)
+                if (Bline_right[j]<185)
                 {
                    p1 = Bline_right[j];
                    break;
@@ -413,7 +491,7 @@ void imagineProcess(void)
               } 
               for(int j = H-19;j>H-22;j--)
               {
-                if (Bline_right[j]<178)
+                if (Bline_right[j]<180)
                 {
                    p2 = Bline_right[j];
                    break;
@@ -422,14 +500,14 @@ void imagineProcess(void)
               } 
               for(int j = H-26;j>H-30;j--)
               {
-                if (Bline_right[j]<173)
+                if (Bline_right[j]<175)
                 {
                    p3 = Bline_right[j];
                    break;
                 }
                 
               }
-              if(p1 && p2 && p3 && abs(p2-p1)<10 && abs(p3-p2)<10 && abs(p3-p1)<20)
+              if(p1 && p2 && p3 && abs(p2-p1)<15 && abs(p3-p2)<15 && abs(p3-p1)<30)
               {
                 int r = 0;
                 for(int j = H-11;j>H-41;j--)
@@ -453,12 +531,12 @@ void imagineProcess(void)
               {
                 Pick_table[i] = Bline_right[i]-60;
               }
-              if(judgeLeft(35,45,15) == 1)
+              if(cnt_1 > 5 && judgeLeft(20,30,20) == 1)
               {
                 cnt_1 = 0;
                 lstatus = 2;
               }
-              if(cnt_1 > 35)
+              if(cnt_1 > 25)
               {
                 cnt_1 = 0;
                 lstatus = 0;
@@ -469,12 +547,12 @@ void imagineProcess(void)
             {               
               static int cnt_2 = 0;
               cnt_2++;
-              if(cnt_2 > 30)
+              if(cnt_2 > 20)
               {
                 cnt_2 = 0;
                 lstatus = 0;
               }
-              if(judgeLeft(25,35,10) == 0)
+              if(judgeLeft(25,35,15) == 0)
               {
                 cnt_2 = 0;
                 lstatus = 3;
@@ -487,9 +565,9 @@ void imagineProcess(void)
               cnt_3++;
                for(int i = H-11;i>H-41;i--)
               {
-                Pick_table[i] = Bline_left[i]+50;
+                Pick_table[i] = Bline_left[i]+45;
               }
-              if(cnt_3 > 12)
+              if(cnt_3 > 6)
               {
                   cnt_3 = 0;
                   lstatus = 4;
@@ -500,7 +578,7 @@ void imagineProcess(void)
             {
               static int cnt_4 = 0;
               cnt_4++;
-              if(cnt_4>50)
+              if(cnt_4>20)
               {
                 if(judgeRight(15,25,170) == 1)
                 {
@@ -517,7 +595,7 @@ void imagineProcess(void)
               {
                 Pick_table[i] = Bline_left[i]+50;
               }
-              if(cnt_5>20 && judgeRight(25,35,170)==0)
+              if(cnt_5> 10 && judgeRight(25,35,170)==0)
               {
                 cnt_5 = 0;
                 lstatus = 7;
@@ -533,7 +611,7 @@ void imagineProcess(void)
               {
                 Pick_table[i] = Bline_right[i]-50;
               }
-              if(cnt_7 > 20)
+              if(cnt_7 > 30 || cnt_7 >15 && judgeLeft(15,25,20) == 1)
               {
                 cnt_7 = 0;
                 lstatus = 0;
@@ -553,7 +631,7 @@ void imagineProcess(void)
                angle_status = 1;
                int jumpl=94,jumpr=94;
                int matchpointl = 0,matchpointr = 0;
-               for(int i = H-61;i>H-81;i--)
+               for(int i = H-51;i>H-81;i--)
                {
                  for(int j = 30;j<V/2-1;j++)
                  {
@@ -589,13 +667,13 @@ void imagineProcess(void)
                {
                  if(LAP_NUM == 0)
                  {
-                   setpoint1 = setpoint2 = -40;
-                   delayms(300);
+                   setpoint1 = setpoint2 = -250;
+                   delayms(500);
                    setpoint1 = setpoint2 = 0;
                    uart_putchar(UART_0,'n');
                    delayms(5000);
                    real_signal_number = signal_number;
-                   setpoint1 = setpoint2 = -20;
+                   setpoint1 = setpoint2 = -50;
                    delayms(500);
                    
                    if( real_signal_number % 2)
@@ -634,7 +712,7 @@ void imagineProcess(void)
                {
                  angle_status = 3;
                  STATUS_NOW++;
-                 if(april_tag_position == 1)
+                 if(april_tag_position == 1 && april_tag_in_three_road)
                  {
                    STATUS_NOW++;
                  }
@@ -644,7 +722,7 @@ void imagineProcess(void)
             
             if(angle_status == 3)
             {
-              if(left_slope > 0.1 && right_slope < -0.1)
+              if(left_slope > 0 && right_slope < 0)
               {
                 angle_status = 4;
               }
@@ -674,12 +752,12 @@ void imagineProcess(void)
                    Pick_table[i] = Bline_right[i]-50;
                 }
                angle_in_cnt++;
-               if(angle_in_cnt > 20  && LAP_NUM ==0 || angle_in_cnt > 10 && LAP_NUM ==1)
+               if(angle_in_cnt > 23  && LAP_NUM ==0 || angle_in_cnt > 10 && LAP_NUM ==1)
                {
                  angle_status = 6;
                  angle_in_cnt = 0;
                  STATUS_NOW++;
-                 if(april_tag_position == 0)
+                 if(april_tag_in_three_road && april_tag_position == 0)
                  {
                    STATUS_NOW++;
                  }
@@ -688,7 +766,7 @@ void imagineProcess(void)
             
             if(angle_status == 6)
             {
-              if(left_slope > 0.1 && right_slope < -0.1)
+              if(left_slope > 0 && right_slope < 0)
               {
                 angle_status = 7;
               }
@@ -699,10 +777,10 @@ void imagineProcess(void)
               static int angle_out_cnt = 0;
                for(int i = H-21;i>H-41;i--)
                 {
-                   Pick_table[i] = Bline_right[i]-50;
+                   Pick_table[i] = 130;
                 }
                angle_out_cnt++;
-               if(angle_out_cnt > 10)
+               if(angle_out_cnt > 5)
                {
                  angle_status = 0;
                  angle_out_cnt = 0;
@@ -716,35 +794,110 @@ void imagineProcess(void)
           
           if(status == CROSS_STATUS)
           {
-             if(judgeLeft(15,35,10)==0 && judgeRight(15,35,180)==1 && !cstatus)
+             static int cnt_c1 = 0;
+             if(judgeLeft(15,35,5) == 0 && judgeRight(15,35,183) == 1 && !cstatus)
              {
                cstatus = 1;
                lstatus = rstatus = 0;
-               
              }
+          
              if(cstatus == 1)
              {
-               static int cnt_c1 = 0;
+               /*if(Bline_left[H-10] > 15 && Bline_right[H-10] < 175 && Bline_left[H-11] > 15 && Bline_right[H-11] < 175)
+               {
+                 int valid_line_left = H-81;
+                 int valid_line_right = H-81;
+                 int find_valid_flag_left = 0;
+                 int find_valid_flag_right = 0;
+                 for(int i = H-81;i > H-1;i--)
+                 {
+                   if(Bline_left[i] > 15 && Bline_left[i+1] < 5)
+                   {
+                     valid_line_left = i;
+                     find_valid_flag_left = 1;
+                     break;
+                   }
+                 }
+                 
+                 for(int i = H-81;i > H-1;i--)
+                 {
+                   if(Bline_right[i] < 170 && Bline_right[i+1] > 180)
+                   {
+                     valid_line_right = i;
+                     find_valid_flag_right = 1;
+                     break;
+                   }
+                 }
+                 
+                 if(find_valid_flag_left && find_valid_flag_right)
+                 {
+                   double k_left = (Bline_left[valid_line_left]-Bline_left[H-10])/(valid_line_left - (H - 10));
+                   double k_right = (Bline_right[valid_line_right]-Bline_right[H-10])/(valid_line_right - (H - 10));
+                   for(int i = valid_line_left+1; i <= H-21; i++)
+                   {
+                     Bline_left[i] = Bline_left[i-1]+k_left*(i-valid_line_left);
+                   }
+                   for(int i = valid_line_right+1; i <= H-21; i++)
+                   {
+                     Bline_right[i] = Bline_right[i-1]+k_right*(i-valid_line_right);
+                   }
+                   for(int i = H-41; i <= H-21; i++)
+                   {
+                     Pick_table[i] = (Bline_left[i] + Bline_right[i])/2;
+                   }
+                     
+                 }
+                 
+               }
+               else
+               {*/
+                 int valid_line = H-61;
+                 int find_valid_flag = 0;
+                 for(int i = H-21;i > H-61;i--)
+                 {
+                   if(Bline_left[i] > 20 && Bline_right[i] < 170)
+                   {
+                     valid_line = i;
+                     find_valid_flag = 1;
+                     break;
+                   }
+                 }
+                 
+                 if(find_valid_flag)
+                 {
+                   for(int i = valid_line+1; i <= H-21; i++)
+                   {
+                     Bline_left[i] = Bline_left[i-1];
+                     Bline_right[i] = Bline_right[i-1];
+                     Pick_table[i] = (Bline_left[i] + Bline_right[i])/2;
+                   }
+                 }
+                 
+               //}
+
+
+               
                cnt_c1++;
-               if(cnt_c1 > 20)
+               if(cnt_c1 > 10 || cnt_c1>5 && judgeLeft(15,25,15) == 1 && judgeRight(15,25,173) == 0)
                {
                  cnt_c1 = 0;
                  cstatus = 0;
-                 STATUS_NOW++;
+                STATUS_NOW++;
                }
              }
           }
               
            
-         if(!rstatus && !lstatus && !cstatus && status != START_STATUS && !ready_to_stop)
+         if(status != START_STATUS && !ready_to_stop && !cstatus && !rstatus && !lstatus)
          {
+           
            if(speedflag != 1)
            {
               setpoint1 = setpoint2 = NORMAL_SPEED;
               speedflag = 1;
            }
          }
-         else if(lstatus || rstatus)
+         else if(rstatus || lstatus)
          {
            if(speedflag != 2)
            {
@@ -756,6 +909,7 @@ void imagineProcess(void)
          {
            if(speedflag != 3)
            {
+              //PWMSetSteer(1250);
               setpoint1 = setpoint2 = CROSS_SPEED;
               speedflag = 3;
            }
@@ -779,18 +933,17 @@ void imagineProcess(void)
           
           if(status == START_STATUS)
           {
-            /*if(!sstatus)
-            {
-              if(judgeLeft(15,25,10)==0 && judgeRight(15,25,180)==1)
-              {
-                sstatus = 1;
-              }
-            }*/
             
             if(sstatus == 1)
             {
                start_cnt++;
-               if(start_cnt < 50)
+               
+               if(start_cnt <= 10)
+               {
+                 PWMSetSteer(1250);
+               }
+               
+               if(start_cnt < 30 && start_cnt > 10)
                {
                  if(!DIRECTION)
                   {
@@ -808,7 +961,7 @@ void imagineProcess(void)
                   }
                }
               
-              if(start_cnt > 50)
+              if(start_cnt > 30)
               {
                 start_cnt = 0;
                 STATUS_NOW++;
@@ -823,7 +976,7 @@ void imagineProcess(void)
               int jumppoint = 0;
               if(!stopflag)
               {
-                for(int i = H-41;i>H-61;i--)
+                for(int i = H-11;i>H-61;i--)
                 {
                   for(int j = V-10;j>V-185;j--)
                   {
@@ -833,7 +986,7 @@ void imagineProcess(void)
                       jumppoint++;
                     }
                   }
-                  if(jumppoint > 8)
+                  if(jumppoint > 4)
                   {
                     if(!LAP_NUM)
                     {
@@ -869,6 +1022,13 @@ void imagineProcess(void)
                  static int stop_cnt = 0;
                  if(!DIRECTION)
                  {
+                   for(int i = H-61;i>H-21;i++)
+                   {
+                      if(Bline_right[i+1] - Bline_right[i] < 0)
+                      {
+                        Bline_right[i+1] = Bline_right[i];
+                      }
+                   }
                    for(int i = H-21;i>H-41;i--)
                    {
                       Pick_table[i] = Bline_right[i]-50;
@@ -876,6 +1036,13 @@ void imagineProcess(void)
                  }
                  else
                  {
+                   for(int i = H-61;i>H-21;i++)
+                   {
+                      if(Bline_left[i+1] - Bline_left[i] > 0)
+                      {
+                        Bline_left[i+1] = Bline_left[i];
+                      }
+                   }
                    for(int i = H-21;i>H-41;i--)
                    {
                       Pick_table[i] = Bline_left[i]+50;
@@ -883,7 +1050,7 @@ void imagineProcess(void)
                  }
                  
                  stop_cnt++;
-                 if(stop_cnt>25)
+                 if(stop_cnt>15)
                  {
                    stop_cnt = 0;
                    stopflag = 0;
@@ -899,7 +1066,7 @@ void imagineProcess(void)
                     Pick_table[i] = Bline_left[i]+40;
                  }
                  black_cnt++;
-                 if(black_cnt>20)
+                 if(black_cnt>10)
                  {
                    havestop=1;
                    setpoint1 = setpoint2 = 0;
@@ -916,7 +1083,7 @@ void imagineProcess(void)
                     Pick_table[i] = Bline_right[i]-50;
                  }
                  black_cnt++;
-                 if(black_cnt>20)
+                 if(black_cnt>10)
                  {
                    havestop=1;
                    setpoint1 = setpoint2 = 0;
@@ -943,11 +1110,11 @@ void imagineProcess(void)
                     jumppoint++;
                   }
                 }
-                if(jumppoint >= 4)
+                if(jumppoint >= 2)
                 {
                   PWMSetSteer(1250);
                   setpoint1 = setpoint2 = -50;
-                  delayms(700);
+                  delayms(500);
                   setpoint1 = setpoint2 = 0;
                   uart_putchar(UART_0,'a');
                   delayms(1000);
@@ -973,7 +1140,7 @@ void imagineProcess(void)
             if(april_tag_status == 1)
             {
               april_tag_cnt++;
-              if(april_tag_cnt > 30)
+              if(april_tag_cnt > 8)
               {
                 april_tag_cnt = 0;
                 april_tag_status = 0;
@@ -1029,8 +1196,9 @@ void LQMT9V034_Init(void)
       } ; //摄像头识别失败，停止运行
   }  
 
-  MT9V034_SetFrameResolution(IMAGEH, IMAGEW);//设置摄像头图像4*4分频输出PCLK, 27/4 = 6.75M ,BIT4,5镜像设置:上下左右均镜像   
-  MT9V034_SetAutoExposure(1);  
+  /*MT9V034_SetFrameResolution(IMAGEH, IMAGEW);//设置摄像头图像4*4分频输出PCLK, 27/4 = 6.75M ,BIT4,5镜像设置:上下左右均镜像   
+  MT9V034_SetAutoExposure(0);  
+  
   SCCB_RegWrite(MT9V034_I2C_ADDR, 0xAC, 0x0001);
   SCCB_RegWrite(MT9V034_I2C_ADDR, 0xAD, 0x01E0);  
   SCCB_RegWrite(MT9V034_I2C_ADDR, 0x2C, 0x0004);
@@ -1046,15 +1214,16 @@ void LQMT9V034_Init(void)
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_ROW_NOISE_CORR_CTRL_REG, 0);   //0x70  0x0000 
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE_REG, 0x0303);   //0xAF  AEC/AGC A~bit0:1AE;bit1:1AG/B~bit2:1AE;bit3:1AG
   
-  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MIN_EXPOSURE_REG, 0x0380);     //0xAC  最小粗快门宽度   0x0001
-  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_EXPOSURE_REG, 0x0480);     //0xAD  最大醋快门宽度   0x01E0-480
-  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_GAIN_REG, 60);             //0xAB  最大模拟增益     64
+  
+  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MIN_EXPOSURE_REG, 0x0380); //0x0380   //0xAC  最小粗快门宽度   0x0001
+  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_EXPOSURE_REG, 0x0480); //0x0480     //0xAD  最大醋快门宽度   0x01E0-480
+  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_GAIN_REG, 64);             //0xAB  最大模拟增益     64
   
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AGC_AEC_PIXEL_COUNT_REG, 188*120);//0xB0  用于AEC/AGC直方图像素数目,最大44000   4096=320*240  
   SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_ADC_RES_CTRL_REG, 0x0303);     //0x1C  here is the way to regulate darkness :)    
   
   SCCB_RegWrite(MT9V034_I2C_ADDR,0x13,0x2D2E);//We also recommended using R0x13 = 0x2D2E with this setting for better column FPN.  
-  SCCB_RegWrite(MT9V034_I2C_ADDR,0x20,0x03C7);//0x01C7对比度差，发白；0x03C7对比度提高 Recommended by design to improve performance in HDR mode and when frame rate is low.
+  SCCB_RegWrite(MT9V034_I2C_ADDR,0x20,0x01C7);//0x01C7对比度差，发白；0x03C7对比度提高 Recommended by design to improve performance in HDR mode and when frame rate is low.
   SCCB_RegWrite(MT9V034_I2C_ADDR,0x24,0x0010);//Corrects pixel negative dark offset when global reset in R0x20[9] is enabled.
   SCCB_RegWrite(MT9V034_I2C_ADDR,0x2B,0x0003);//Improves column FPN.
   SCCB_RegWrite(MT9V034_I2C_ADDR,0x2F,0x0003);//Improves FPN at near-saturation.  
@@ -1077,12 +1246,40 @@ void LQMT9V034_Init(void)
   //SCCB_RegWrite(MT9V034_I2C_ADDR, 0x0A, 0x0064);
   //SCCB_RegWrite(MT9V034_I2C_ADDR, 0x0B, 0x03E8);
   //SCCB_RegWrite(MT9V034_I2C_ADDR, 0x0F, 0x0103);
-  //SCCB_RegWrite(MT9V034_I2C_ADDR, 0x35, 0x8010);   
+  //SCCB_RegWrite(MT9V034_I2C_ADDR, 0x35, 0x8010); 
+    */
+  
+  MT9V034_SetFrameResolution(IMAGEH, IMAGEW);
 
-  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_RESET, 0x03);          //0x0c  复位 
+    /* 设置帧率 */
+    //MT9V034_SetFrameRate(25);
+
+    /* 曝光设置 */
+    MT9V034_SetAutoExposure(0);
+    
+    SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MIN_EXPOSURE_REG, 0x0380); //0x0380   //0xAC  最小粗快门宽度   0x0001
+    SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_EXPOSURE_REG, 0x0480); //0x0480     //0xAD  最大醋快门宽度   0x01E0-480
+
+	SCCB_RegWrite(MT9V034_I2C_ADDR, 0x2C, 0x0004);  //参考电压设置   1.4v
+    SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_ANALOG_CTRL, MT9V034_ANTI_ECLIPSE_ENABLE);  //反向腐蚀
+    SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_ADC_RES_CTRL_REG, 0x0303);      //0x1C  here is the way to regulate darkness :)
+    ////
+    SCCB_RegWrite(MT9V034_I2C_ADDR,0x13,0x2D2E);//We also recommended using R0x13 = 0x2D2E with this setting for better column FPN.
+    SCCB_RegWrite(MT9V034_I2C_ADDR,0x20,0x01c7);//0x01C7对比度差，发白；0x03C7对比度提高 Recommended by design to improve performance in HDR mode and when frame rate is low.
+    SCCB_RegWrite(MT9V034_I2C_ADDR,0x24,0x0010);//Corrects pixel negative dark offset when global reset in R0x20[9] is enabled.
+    SCCB_RegWrite(MT9V034_I2C_ADDR,0x2B,0x0003);//Improves column FPN.
+    SCCB_RegWrite(MT9V034_I2C_ADDR,0x2F,0x0003);//Improves FPN at near-saturation.
+
+    SCCB_RegWrite(MT9V034_I2C_ADDR,MT9V034_V2_CTRL_REG_A, 0x001A);        //0x32   0x001A
+    SCCB_RegWrite(MT9V034_I2C_ADDR,MT9V034_HDR_ENABLE_REG,0x0103); 
+
+
+
+  SCCB_RegWrite(MT9V034_I2C_ADDR,MT9V034_AGC_AEC_DESIRED_BIN_REG, 64);
+  SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_RESET, 0x03);   
   
   //GPIO口初始化
-  exti_enable(PTD14,IRQ_RISING|PULLDOWN);   //行中断
+  //exti_enable(PTD14,IRQ_RISING|PULLDOWN);   //行中断
   exti_enable(PTD15,IRQ_FALLING|PULLUP);    //场中断 
   gpio_init(PTD0,GPI,0);          //八位数据输入口      
   gpio_init(PTD1,GPI,0);  
@@ -1093,7 +1290,9 @@ void LQMT9V034_Init(void)
   gpio_init(PTD6,GPI,0);
   gpio_init(PTD7,GPI,0);
   //初始化DMA采集  
-  dma_portx2buff_init(DMA_CH4, (void *)&PTD_BYTE0_IN,(void*)Image_Data, PTD13, DMA_BYTE1, IMAGEW*IMAGEH, DMA_RISING);  
+  dma_portx2buff_init(DMA_CH4, (void *)&PTD_BYTE0_IN,(void*)Image_Data, PTD13, DMA_BYTE1, IMAGEW*IMAGEH, DMA_RISING);
+   
+  
 }     
 
 void setbinary()
@@ -1160,15 +1359,33 @@ void MT9V034_SetFrameResolution(uint16_t height,uint16_t width)
 void MT9V034_SetAutoExposure(char enable)
 {
   uint16_t reg =0;
-  SCCB_RegRead(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE,&reg);
-  if(1 == enable)
-  {
-    SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE, reg|MT9V034_AEC_ENABLE|MT9V034_AGC_ENABLE);
-  }
-  else
-  {
-    SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE, reg&~(MT9V034_AEC_ENABLE|MT9V034_AGC_ENABLE));
-  }
+    SCCB_RegRead(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE,&reg);
+    if(enable)
+    {
+        /* 开启自动曝光自动增益 */
+        SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE, reg|MT9V034_AEC_ENABLE|MT9V034_AGC_ENABLE);
+        /* 最大曝光时间 修改这里可以修改比较暗时的图像整体亮度*/
+        SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_EXPOSURE_REG, CAMERA_MAX_EXPOSURE_TIME);
+        /* 最小曝光时间 修改这里可以修改遇到强光时的图像整体亮度*/
+        SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MIN_EXPOSURE_REG, CAMERA_MIN_EXPOSURE_TIME);
+        /* 最大增益 增大这里 图像偏暗的情况下保留更多的细节 但是可能产生噪点 0-60*/
+        SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_GAIN_REG, 20);
+        /* 0xB0  用于AEC/AGC直方图像素数目,22560 最大44000  */
+        SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AGC_AEC_PIXEL_COUNT_REG, 22560);
+         
+    }
+    else
+    {
+        /* 关闭自动曝光 */
+        SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_AEC_AGC_ENABLE, reg&~(MT9V034_AEC_ENABLE|MT9V034_AGC_ENABLE));
+        
+        /* 0xAB  最大模拟增益     64 */
+        SCCB_RegWrite(MT9V034_I2C_ADDR, MT9V034_MAX_GAIN_REG, 64);  
+        
+        /* 0x0B 设置曝光时间 0–32765 */
+        SCCB_RegWrite(MT9V034_I2C_ADDR,MT9V034_TOTAL_SHUTTER_WIDTH,CAMERA_EXPOSURE_TIME);   
+  
+    }
 }
 void MT9V034_SetFrameRate(uint8_t frameRate)
 {
