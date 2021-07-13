@@ -15,6 +15,8 @@
 void UART2_ISR(void){}
 void UART1_ISR(void){}
 
+int negative_flag = 0;
+
 void UART0_ISR(void)
 {    
   DisableInterrupts ;//关总中断
@@ -23,10 +25,34 @@ void UART0_ISR(void)
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_RDRF_MASK)   //接收数据寄存器满
   {
     Data=uart_getchar(UART_0);
-    signal_number = Data - '0';
-    //setpoint1 = setpoint2 = -10;
-    //my_steer_set(3050);
-    //uart_putchar(UART_0,Data);
+    if(shoot_flag == 1)
+    {
+      if(Data == '-')
+      {
+        negative_flag = 1;
+      }
+      else if(Data != '#')
+      {
+        shoot_error += ( Data - '0' );
+        shoot_error *= 10;
+      }
+      else
+      {
+        if(negative_flag)
+        {
+          shoot_error *= -1;
+          negative_flag = 0;
+        }
+        shoot_flag = 0;
+        recv_msg_flag = 1;
+      } 
+    }
+    else
+    {
+      signal_number = Data - '0';
+      recv_msg_flag = 1;
+    }
+      
   }
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_TDRE_MASK)  //发送数据寄存器空
   {

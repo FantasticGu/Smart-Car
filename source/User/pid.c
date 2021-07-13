@@ -38,6 +38,24 @@ void pid_compute_new(float in1,float in2)
     float error2=setpoint2-in2;
     iterm2+=error2;
     
+    /*if(error1 < 0)
+    {
+      p1 = 200;
+    }
+    else
+    {
+      p1 = 100;
+    }
+    
+    if(error2 < 0)
+    {
+      p2 = 200;
+    }
+    else
+    {
+      p2 = 100;
+    }*/
+    
     if(iterm1>max_speed)
       iterm1=max_speed;
     else if(iterm1<min_speed)

@@ -186,8 +186,9 @@ int TOTAL_STATUS[] =
 }; */
 
 
-{START_STATUS,
+{//START_STATUS,
                       CIRCLE_STATUS,
+  //APRIL_TAG_STATUS,
                       THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
                       CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,
                       STOP_STATUS,
@@ -199,6 +200,10 @@ int TOTAL_STATUS[] =
 //{START_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,THREE_ROAD_STATUS,
 //                     CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,THREE_ROAD_STATUS,STOP_STATUS};
 
+int shoot_error = 0;
+int shoot_flag = 0;
+
+int recv_msg_flag = 0;
 
 int april_tag_position = 0; //left: 0, right: 1
 
@@ -211,6 +216,7 @@ int signal_number = 2;
 int real_signal_number = 2;
 int april_tag_number = 0;
 int april_tag_in_three_road = 1;
+int is_fruit = 0;
 
 int LAP_NUM = 0;
 
@@ -625,7 +631,7 @@ void imagineProcess(void)
           
           if(status == THREE_ROAD_STATUS)
           {
-            if(left_slope > 0 && right_slope < 0
+            if(left_slope > 0.1 && right_slope < -0.1
             && angle_status < 2)
             {
                angle_status = 1;
@@ -667,16 +673,28 @@ void imagineProcess(void)
                {
                  if(LAP_NUM == 0)
                  {
-                   setpoint1 = setpoint2 = -250;
+                   setpoint1 = setpoint2 = -200;
+                   delayms(500);
+                   setpoint1 = setpoint2 = -30;
                    delayms(500);
                    setpoint1 = setpoint2 = 0;
                    uart_putchar(UART_0,'n');
-                   delayms(5000);
-                   real_signal_number = signal_number;
-                   setpoint1 = setpoint2 = -50;
-                   delayms(500);
+                   uart_putchar(UART_0,'n');
+                   for(int i = 0; i < 10; i++)
+                   {
+                     delayms(500);
+                     if(recv_msg_flag != 0)
+                     {
+                       gpio_set(PTD12,1);
+                       delayms(500);
+                       gpio_set(PTD12,0);
+                       real_signal_number = signal_number;
+                       recv_msg_flag = 0;
+                       break;
+                     }
+                   }
                    
-                   if( real_signal_number % 2)
+                   if(real_signal_number % 2)
                    {
                       angle_status = 2; 
                    }
@@ -1110,25 +1128,85 @@ void imagineProcess(void)
                     jumppoint++;
                   }
                 }
-                if(jumppoint >= 2)
+                if(jumppoint >= 3)
                 {
+                  int steer_status = 1800;
                   PWMSetSteer(1250);
                   setpoint1 = setpoint2 = -50;
-                  delayms(500);
+                  delayms(1000);
                   setpoint1 = setpoint2 = 0;
                   uart_putchar(UART_0,'a');
-                  delayms(1000);
-                  april_tag_number = signal_number;
-                  if(april_tag_number % 2)
+                  for(int i = 0; i < 50; i++)
+                  {
+                     delayms(100);
+                     if(recv_msg_flag)
+                     {
+                       gpio_set(PTD12,1);
+                       delayms(500);
+                       gpio_set(PTD12,0);
+                       april_tag_number = signal_number;
+                       recv_msg_flag = 0;
+                       break;
+                     }
+                   }
+                  setpoint1 = setpoint2 = 50;
+                  delayms(500);
+                  setpoint1 = setpoint2 = 0;
+                  if(!(april_tag_number % 2))
                   {
                     my_steer_set(550);
+                    steer_status = 550;
                   }
                   else
                   {
                     my_steer_set(3050);
+                    steer_status = 3050;
                   }
                   delayms(500);
+                  uart_putchar(UART_0,'f');
+                  for(int i = 0; i < 50; i++)
+                  {
+                     delayms(100);
+                     if(recv_msg_flag)
+                     {
+                       gpio_set(PTD12,1);
+                       delayms(500);
+                       gpio_set(PTD12,0);
+                       is_fruit = signal_number;
+                       recv_msg_flag = 0;
+                       break;
+                     }
+                   }
+                  if(!is_fruit)
+                  {
+                    delayms(2000);
+                  }
+                  else
+                  {
+                    shoot_flag = 1;
+                    uart_putchar(UART_0,'r');
+                     for(int i = 0; i < 50; i++)
+                    {
+                       delayms(100);
+                       if(recv_msg_flag)
+                       {
+                         gpio_set(PTD12,1);
+                         delayms(500);
+                         gpio_set(PTD12,0);
+                         recv_msg_flag = 0;
+                         break;
+                       }
+                     }
+                    my_steer_set(steer_status+10*shoot_error);
+                    steer_status = steer_status+10*shoot_error;
+                    ftm_pwm_duty(FTM3,FTM_CH7,5000);
+                    delayms(1500);
+                    ftm_pwm_duty(FTM3,FTM_CH7,0);
+                    shoot_error = 0;          
+                  }
+                  
                   my_steer_set(1800);
+                  steer_status = 1800;
                   delayms(500);
                   setpoint1 = setpoint2 = NORMAL_SPEED;              
                   april_tag_status = 1;

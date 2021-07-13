@@ -103,6 +103,9 @@ extern uint8 Cmp;	//黑线阈值
 
 extern int speedflag; 
 extern int signal_number;
+extern int recv_msg_flag;
+extern int shoot_error;
+extern int shoot_flag;
 
 
 extern uint8 Image_Data[H][V];      //图像原始数据存放

@@ -159,7 +159,7 @@ float regression(int startline,int endline,uint16* data)
 void my_steer_init()
 {
   ftm_pwm_init(FTM3,FTM_CH3,125,1800);
-  ftm_pwm_init(FTM3,FTM_CH7,125,5000);
+  ftm_pwm_init(FTM3,FTM_CH7,125,0);
   //right: 550
   //middle: 1800
   //left: 3050
