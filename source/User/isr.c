@@ -43,6 +43,10 @@ void UART0_ISR(void)
           shoot_error *= -1;
           negative_flag = 0;
         }
+        shoot_error /= 10;
+        //my_steer_set(shoot_error);
+        //shoot_error = 0;
+        //uart_printf(UART_0,"\n shoot_error = %d\n",shoot_error);
         shoot_flag = 0;
         recv_msg_flag = 1;
       } 
@@ -56,7 +60,8 @@ void UART0_ISR(void)
   }
   if(UART_S1_REG(UARTN[uratn]) & UART_S1_TDRE_MASK)  //发送数据寄存器空
   {
-    //uart_putchar(UART_0,Data);
+    /*uart_putchar(UART_0,Data);*/
+    
   }
   EnableInterrupts;   //开总中断
 }

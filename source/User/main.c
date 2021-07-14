@@ -15,7 +15,7 @@
 #define test_port UART_0
 //#if -#elif -#endif  是预编译命令， 1表示要编译的内容，测试I2C
 #if 1
-//串口打印 “Hello world!”
+//串口打印 “Hello world!void main()
 void main()
 {
 
@@ -23,7 +23,7 @@ void main()
   
   DisableInterrupts;
   pit_init(PIT0, 100);
-  uart_init(test_port, 256000); 
+  uart_init(test_port, 115200); 
   LQMT9V034_Init();                         
   ftm_quad_init(FTM1);
   ftm_quad_init(FTM2);//ftm正交解码计数初始化

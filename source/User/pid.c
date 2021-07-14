@@ -40,7 +40,7 @@ void pid_compute_new(float in1,float in2)
     
     /*if(error1 < 0)
     {
-      p1 = 200;
+      p1 = 300;
     }
     else
     {
@@ -49,7 +49,7 @@ void pid_compute_new(float in1,float in2)
     
     if(error2 < 0)
     {
-      p2 = 200;
+      p2 = 300;
     }
     else
     {
@@ -140,7 +140,7 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
             if(speedflag == 1)
             {
-                setpoint1 = NORMAL_SPEED+2.5*dir_error;
+                setpoint1 = NORMAL_SPEED+3*dir_error;
                 setpoint2 = NORMAL_SPEED;
             }
             else if(speedflag == 2)
@@ -267,7 +267,7 @@ void ele_direction_control()
             dir_P_value=dir_control_P*dir_error;
             if(speedflag == 1)
             {
-              setpoint2 = NORMAL_SPEED-2.5*dir_error;
+              setpoint2 = NORMAL_SPEED-3*dir_error;
               setpoint1 = NORMAL_SPEED;
             }
             else if(speedflag == 2)

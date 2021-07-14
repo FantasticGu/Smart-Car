@@ -165,7 +165,7 @@ static unsigned int queue_cnt = 0;
 #define APRIL_TAG_STATUS 4
 #define STOP_STATUS 5
 
-int DIRECTION = 0; //0:ÄæÊ±Õë£¬1£ºË³Ê±Õë¡£
+int DIRECTION = 1; //0:ÄæÊ±Õë£¬1£ºË³Ê±Õë¡£
 
 /*int TOTAL_STATUS[] = {START_STATUS,
                      //CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,
@@ -175,7 +175,7 @@ int DIRECTION = 0; //0:ÄæÊ±Õë£¬1£ºË³Ê±Õë¡£
                       CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};*/
 
 int TOTAL_STATUS[] =
-/*{START_STATUS,
+{START_STATUS,
                       CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,
                       THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
                       CIRCLE_STATUS,
@@ -183,10 +183,10 @@ int TOTAL_STATUS[] =
                       CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,
                       THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
                       CIRCLE_STATUS,STOP_STATUS
-}; */
+};
 
-
-{//START_STATUS,
+/*
+{                     START_STATUS,
                       CIRCLE_STATUS,
   //APRIL_TAG_STATUS,
                       THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
@@ -196,7 +196,7 @@ int TOTAL_STATUS[] =
                       THREE_ROAD_STATUS,APRIL_TAG_STATUS,THREE_ROAD_STATUS,
                       CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,STOP_STATUS};
 
-
+*/
 //{START_STATUS,CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,THREE_ROAD_STATUS,
 //                     CIRCLE_STATUS,CROSS_STATUS,CROSS_STATUS,CIRCLE_STATUS,THREE_ROAD_STATUS,STOP_STATUS};
 
@@ -205,7 +205,7 @@ int shoot_flag = 0;
 
 int recv_msg_flag = 0;
 
-int april_tag_position = 0; //left: 0, right: 1
+int april_tag_position = 1; //left: 0, right: 1
 
 int STATUS_NOW = 0;
 int STATUS_LAST = 0;
@@ -404,7 +404,7 @@ void imagineProcess(void)
                  {
                    Pick_table[i] = Bline_right[i]-45;
                  }
-                 if(cnt_3 > 6)
+                 if(cnt_3 > 8)
                  {
                    cnt_3 = 0;
                    rstatus = 4;
@@ -436,7 +436,7 @@ void imagineProcess(void)
                {
                  Pick_table[i] = Bline_right[i]-50;
                }
-               if(cnt_6 > 10 && judgeLeft(15,25,15) == 1)
+               if(cnt_6 > 12 && judgeLeft(15,25,15) == 1)
                {
                  cnt_6 = 0;
                  rstatus = 7;
@@ -573,7 +573,7 @@ void imagineProcess(void)
               {
                 Pick_table[i] = Bline_left[i]+45;
               }
-              if(cnt_3 > 6)
+              if(cnt_3 > 8)
               {
                   cnt_3 = 0;
                   lstatus = 4;
@@ -601,7 +601,7 @@ void imagineProcess(void)
               {
                 Pick_table[i] = Bline_left[i]+50;
               }
-              if(cnt_5> 10 && judgeRight(25,35,170)==0)
+              if(cnt_5> 12 && judgeRight(25,35,170)==0)
               {
                 cnt_5 = 0;
                 lstatus = 7;
@@ -631,7 +631,7 @@ void imagineProcess(void)
           
           if(status == THREE_ROAD_STATUS)
           {
-            if(left_slope > 0.1 && right_slope < -0.1
+            if(left_slope > 0 && right_slope < 0
             && angle_status < 2)
             {
                angle_status = 1;
@@ -673,26 +673,25 @@ void imagineProcess(void)
                {
                  if(LAP_NUM == 0)
                  {
-                   setpoint1 = setpoint2 = -200;
-                   delayms(500);
-                   setpoint1 = setpoint2 = -30;
+                   setpoint1 = setpoint2 = -100;
                    delayms(500);
                    setpoint1 = setpoint2 = 0;
                    uart_putchar(UART_0,'n');
-                   uart_putchar(UART_0,'n');
-                   for(int i = 0; i < 10; i++)
+                   while(1)
                    {
-                     delayms(500);
-                     if(recv_msg_flag != 0)
+                     delayms(100);
+                     if(recv_msg_flag)
                      {
                        gpio_set(PTD12,1);
-                       delayms(500);
+                       delayms(100);
                        gpio_set(PTD12,0);
                        real_signal_number = signal_number;
                        recv_msg_flag = 0;
                        break;
                      }
                    }
+                   setpoint1 = setpoint2 = -30;
+                   delayms(500);
                    
                    if(real_signal_number % 2)
                    {
@@ -1084,7 +1083,7 @@ void imagineProcess(void)
                     Pick_table[i] = Bline_left[i]+40;
                  }
                  black_cnt++;
-                 if(black_cnt>10)
+                 if(black_cnt>15)
                  {
                    havestop=1;
                    setpoint1 = setpoint2 = 0;
@@ -1101,7 +1100,7 @@ void imagineProcess(void)
                     Pick_table[i] = Bline_right[i]-50;
                  }
                  black_cnt++;
-                 if(black_cnt>10)
+                 if(black_cnt>15)
                  {
                    havestop=1;
                    setpoint1 = setpoint2 = 0;
@@ -1128,7 +1127,7 @@ void imagineProcess(void)
                     jumppoint++;
                   }
                 }
-                if(jumppoint >= 3)
+                if(jumppoint >= 5)
                 {
                   int steer_status = 1800;
                   PWMSetSteer(1250);
@@ -1136,13 +1135,13 @@ void imagineProcess(void)
                   delayms(1000);
                   setpoint1 = setpoint2 = 0;
                   uart_putchar(UART_0,'a');
-                  for(int i = 0; i < 50; i++)
+                  while(1)
                   {
                      delayms(100);
                      if(recv_msg_flag)
                      {
                        gpio_set(PTD12,1);
-                       delayms(500);
+                       delayms(100);
                        gpio_set(PTD12,0);
                        april_tag_number = signal_number;
                        recv_msg_flag = 0;
@@ -1150,7 +1149,7 @@ void imagineProcess(void)
                      }
                    }
                   setpoint1 = setpoint2 = 50;
-                  delayms(500);
+                  delayms(750);
                   setpoint1 = setpoint2 = 0;
                   if(!(april_tag_number % 2))
                   {
@@ -1164,13 +1163,13 @@ void imagineProcess(void)
                   }
                   delayms(500);
                   uart_putchar(UART_0,'f');
-                  for(int i = 0; i < 50; i++)
+                  while(1)
                   {
                      delayms(100);
                      if(recv_msg_flag)
                      {
                        gpio_set(PTD12,1);
-                       delayms(500);
+                       //delayms(500);
                        gpio_set(PTD12,0);
                        is_fruit = signal_number;
                        recv_msg_flag = 0;
@@ -1179,35 +1178,182 @@ void imagineProcess(void)
                    }
                   if(!is_fruit)
                   {
-                    delayms(2000);
+                    //delayms(2000);
                   }
                   else
                   {
+                    for(int i=0;i<5;i++)
+                    {
+                    gpio_set(PTD12,1);
+                    delayms(100);
+                    gpio_set(PTD12,0);
+                    //delayms(200);
+                    }
+                    if(april_tag_number % 2)
+                    {
+                    rl_again:
                     shoot_flag = 1;
                     uart_putchar(UART_0,'r');
-                     for(int i = 0; i < 50; i++)
+                    while(1)
                     {
                        delayms(100);
                        if(recv_msg_flag)
                        {
-                         gpio_set(PTD12,1);
-                         delayms(500);
-                         gpio_set(PTD12,0);
+                         //gpio_set(PTD12,1);
+                         //delayms(500);
+                         //gpio_set(PTD12,0);
                          recv_msg_flag = 0;
                          break;
                        }
                      }
-                    my_steer_set(steer_status+10*shoot_error);
-                    steer_status = steer_status+10*shoot_error;
+                    shoot_error-=51;
+                    if(shoot_error < -10)
+                    {
+                      setpoint1 = setpoint2 = -30;
+                      delayms(200);
+                      setpoint1 = setpoint2 = 0;
+                      delayms(200);
+                      shoot_error = 0;
+                      goto rl_again;
+                      
+                    }
+                    else if(shoot_error >= 0)
+                    {
+                      //my_steer_set(1800);
+                      //delayms(300);
+                      switch(shoot_error/10)
+                      {
+                      case 0:
+                        my_steer_set(3050-4*(shoot_error % 10));
+                        break;
+                      case 1:
+                        my_steer_set(3010-3*(shoot_error % 10));
+                        break;
+                      case 2:
+                        my_steer_set(2985-3*(shoot_error % 10));
+                        break;
+                      case 3:
+                        my_steer_set(2960-3*(shoot_error % 10));
+                        break;
+                      case 4:
+                        my_steer_set(2930-3*(shoot_error % 10));
+                        break;
+                      case 5:
+                        my_steer_set(2900-3*(shoot_error % 10));
+                        break;
+                      case 6:
+                        my_steer_set(2870-3*(shoot_error % 10));
+                        break;
+                      case 7:
+                        my_steer_set(2840-3*(shoot_error % 10));
+                        break;
+                      case 8:
+                        my_steer_set(2810-3*(shoot_error % 10));
+                        break;
+                      case 9:
+                        my_steer_set(2780-3*(shoot_error % 10));
+                        break;
+                      default:
+                        setpoint1 = setpoint2 = 30;
+                        delayms(100);
+                        setpoint1 = setpoint2 = 0;
+                        goto rl_again;     
+                      }
+                    }         
+                    delayms(500);
                     ftm_pwm_duty(FTM3,FTM_CH7,5000);
                     delayms(1500);
                     ftm_pwm_duty(FTM3,FTM_CH7,0);
+                    delayms(500);
                     shoot_error = 0;          
                   }
+                    
+                    else
+                    {
+                      rr_again:
+                    shoot_flag = 1;
+                    uart_putchar(UART_0,'r');
+                    while(1)
+                    {
+                       delayms(100);
+                       if(recv_msg_flag)
+                       {
+                         //gpio_set(PTD12,1);
+                         //delayms(500);
+                         //gpio_set(PTD12,0);
+                         recv_msg_flag = 0;
+                         break;
+                       }
+                     }
+                    shoot_error-=51;
+                    if(shoot_error > 10)
+                    {
+                      setpoint1 = setpoint2 = -30;
+                      delayms(200);
+                      setpoint1 = setpoint2 = 0;
+                      delayms(200);
+                      shoot_error = 0;
+                      goto rr_again;
+                      
+                    }
+                    else if(shoot_error <= 0)
+                    {
+                      //my_steer_set(1800);
+                      //delayms(300);
+                      shoot_error *= -1;
+                      switch(shoot_error/10)
+                      {
+                      case 0:
+                        my_steer_set(550+10*(shoot_error % 10));
+                        break;
+                      case 1:
+                        my_steer_set(650+5*(shoot_error % 10));
+                        break;
+                      case 2:
+                        my_steer_set(680+5*(shoot_error % 10));
+                        break;
+                      case 3:
+                        my_steer_set(710+4*(shoot_error % 10));
+                        break;
+                      case 4:
+                        my_steer_set(740+5*(shoot_error % 10));
+                        break;
+                      case 5:
+                        my_steer_set(785+4*(shoot_error % 10));
+                        break;
+                      case 6:
+                        my_steer_set(820+3*(shoot_error % 10));
+                        break;
+                      case 7:
+                        my_steer_set(850+3*(shoot_error % 10));
+                        break;
+                      case 8:
+                        my_steer_set(875+3*(shoot_error % 10));
+                        break;
+                      case 9:
+                        my_steer_set(910+3*(shoot_error % 10));
+                        break;
+                      default:
+                        setpoint1 = setpoint2 = 30;
+                        delayms(100);
+                        setpoint1 = setpoint2 = 0;
+                        goto rr_again;     
+                      }
+                    }         
+                    delayms(500);
+                    ftm_pwm_duty(FTM3,FTM_CH7,5000);
+                    delayms(1500);
+                    ftm_pwm_duty(FTM3,FTM_CH7,0);
+                    delayms(500);
+                    shoot_error = 0;          
+                  }
+                    }
+
+                  
                   
                   my_steer_set(1800);
                   steer_status = 1800;
-                  delayms(500);
+                  delayms(1000);
                   setpoint1 = setpoint2 = NORMAL_SPEED;              
                   april_tag_status = 1;
                   break;
